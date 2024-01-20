@@ -34,8 +34,9 @@ jobs:
 
         for image in ${images[@]}
         do
-          docker build . --file Containerfile --target $image --tag ghcr.io/andyrusiecki/${image}:${build_date}
-          docker tag ghcr.io/andyrusiecki/${image}:${build_date} ghcr.io/andyrusiecki/${image}:latest
-          docker push --all-tags ghcr.io/andyrusiecki/${image}
+          echo "testing command output:"
+          echo "docker build . --file Containerfile --target $image --tag ghcr.io/andyrusiecki/${image}:${build_date}"
+          echo "docker tag ghcr.io/andyrusiecki/${image}:${build_date} ghcr.io/andyrusiecki/${image}:latest"
+          echo "docker push --all-tags ghcr.io/andyrusiecki/${image}"
         done
 
