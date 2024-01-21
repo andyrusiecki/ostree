@@ -1,7 +1,6 @@
 #!/bin/bash
 
 image="$1"
-dir=$(dirname $(realpath $0))
 
 # Replace fedora flatpak repo with flathub (https://www.reddit.com/r/Fedora/comments/z2kk88/fedora_silverblue_replace_the_fedora_flatpak_repo/)
 sudo flatpak remote-modify --no-filter --enable flathub
@@ -41,7 +40,7 @@ flatpak_apps=(
   org.gtk.Gtk3theme.adw-gtk3-ark
   org.libreoffice.LibreOffice
   org.mozilla.firefox
-  runtime/org.freedesktop.Platform.ffmpeg-full/x86_64/22.08
+  $(getFlatpakExtension org.mozilla.firefox org.freedesktop.Platform.ffmpeg-full)
   org.signal.Signal
   us.zoom.Zoom
 )
@@ -113,12 +112,12 @@ systemctl --user enable --now podman.socket
 # make fish the default shell
 sudo usermod -s $(command -v fish) $USER
 
+# create dev distrobox
+distrobox create --name dev --image ghcr.io/andyrusiecki/dev-sandbox:latest
+
 # framework specific options
 if [[ "$image" = "framework" ]]; then
-  # framework specific gnome settings
-  cat $dir/framework-gnome-settings.ini | dconf load /
-
-  # gnome fractional scaling
+  # gnome settings
   gsettings set org.gnome.desktop.interface text-scaling-factor 1.25
   gsettings set org.gnome.mutter experimental-features "['scale-monitor-framebuffer']"
 
