@@ -19,14 +19,52 @@ function getFlatpakExtension() {
   echo "runtime/$app/$(arch)/$version"
 }
 
-flatpak_apps="$(jq -r '.base.flatpaks[]' $dir/config.json | tr '\n' ' ')"
+flatpak_apps=(
+  com.discordapp.Discord
+  com.getpostman.Postman
+  com.github.GradienceTeam.Gradience
+  com.github.marhkb.Pods
+  com.github.tchx84.Flatseal
+  com.github.zocker_160.SyncThingy
+  com.google.Chrome
+  com.mattjakeman.ExtensionManager
+  com.slack.Slack
+  com.spotify.Client
+  com.valvesoftware.Steam
+  com.visualstudio.code
+  io.github.celluloid_player.Celluloid
+  io.github.realmazharhussain.GdmSettings
+  md.obsidian.Obsidian
+  org.Gnome.Boxes
+  org.gnome.World.PikaBackup
+  org.gtk.Gtk3theme.adw-gtk3
+  org.gtk.Gtk3theme.adw-gtk3-ark
+  org.libreoffice.LibreOffice
+  org.mozilla.firefox
+  runtime/org.freedesktop.Platform.ffmpeg-full/x86_64/22.08
+  org.signal.Signal
+  us.zoom.Zoom
+)
 
-flatpak install --noninteractive $flatpak_apps
+flatpak install --noninteractive ${flatpak_apps[@]}
 
 # Gnome Extensions
 # TODO: replace some with Just Perfection with donf settings
-extensions="$(jq -r '.base.gnome-extensions[]' $dir/config.json | tr '\n' ' ')"
-for uuid in $extensions
+extensions=(
+  AlphabeticalAppGrid@stuarthayhurst
+  appindicatorsupport@rgcjonas.gmail.com
+  blur-my-shell@aunetx
+  caffeine@patapon.info
+  mediacontrols@cliffniff.github.com
+  nightthemeswitcher@romainvigier.fr
+  no-overview@fthx
+  notification-banner-reloaded@marcinjakubowski.github.com
+  pip-on-top@rafostar.github.com
+  user-theme@gnome-shell-extensions.gcampax.github.com
+  Vitals@CoreCoding.com
+)
+
+for uuid in ${extensions[@]}
 do
   info_json=$(curl -sS "https://extensions.gnome.org/extension-info/?uuid=$uuid&shell_version=$shell_version")
   download_url=$(echo $info_json | jq ".download_url" --raw-output)
@@ -35,8 +73,39 @@ do
   gnome-extensions enable $uuid
 done
 
-# Gnome dconf settings
-cat $dir/base-gnome-settings.ini | dconf load /
+# Gnome settings
+gsettings set org.gnome.desktop.datetime automatic-timezone true
+
+gsettings set org.gnome.desktop.interface clock-format "12h"
+gsettings set org.gnome.desktop.interface clock-show-weekday true
+gsettings set org.gnome.desktop.interface font-antialiasing "rgba"
+gsettings set org.gnome.desktop.interface font-hinting "slight"
+gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3"
+gsettings set org.gnome.desktop.interface color-scheme 'default'
+
+gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-1 "['<SHIFT><SUPER>1']"
+gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-2 "['<SHIFT><SUPER>2']"
+gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-3 "['<SHIFT><SUPER>3']"
+gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-4 "['<SHIFT><SUPER>4']"
+gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-5 "['<SHIFT><SUPER>5']"
+gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-6 "['<SHIFT><SUPER>6']"
+gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-7 "['<SHIFT><SUPER>7']"
+gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-8 "['<SHIFT><SUPER>8']"
+
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-1 "['<SUPER>1']"
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-2 "['<SUPER>2']"
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-3 "['<SUPER>3']"
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-4 "['<SUPER>4']"
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-5 "['<SUPER>5']"
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-6 "['<SUPER>6']"
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-7 "['<SUPER>7']"
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-8 "['<SUPER>8']"
+
+gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled true
+
+gsettings set org.gnome.system.location enabled true
+
+gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'org.mozilla.firefox.desktop', 'com.google.Chrome.desktop', 'com.spotify.Client.desktop', 'com.valvesoftware.Steam.desktop', 'com.slack.Slack.desktop', 'md.obsidian.Obsidian.desktop', 'com.visualstudio.code.desktop', 'org.gnome.Terminal.desktop']"
 
 # Enable podman socket for user
 systemctl --user enable --now podman.socket
@@ -51,11 +120,14 @@ if [[ "$image" = "framework" ]]; then
 
   # gnome fractional scaling
   gsettings set org.gnome.desktop.interface text-scaling-factor 1.25
-  gsettings set org.gnome.mutter experimental-features "[]'scale-monitor-framebuffer']"
+  gsettings set org.gnome.mutter experimental-features "['scale-monitor-framebuffer']"
 
   # install framework specific flatpaks
-  flatpak_apps="$(jq -r '.framework.flatpaks[]' $dir/config.json | tr '\n' ' ')"
-  flatpak install $flatpak_apps
+  flatpak_apps=(
+    com.github.d4nj1.tlpui
+  )
+
+  flatpak install --noninteractive ${flatpak_apps[@]}
 
   # enable birghtness keys
   sudo rpm-ostree kargs --append="module_blacklist=hid_sensor_hub"

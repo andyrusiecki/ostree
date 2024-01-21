@@ -2,18 +2,33 @@ ARG FEDORA_VERSION="39"
 
 FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_VERSION} as silverblue-base
 
-RUN mkdir /tmp/build
-COPY scripts/ /tmp/build/
 COPY etc/ /etc/
+COPY scripts/install-fonts.sh /tmp/
+RUN mkdir -p /usr/share/andyrusiecki
+COPY scripts/post-install.sh /usr/share/andyrusiecki
 
-RUN /tmp/build/remove-packages.sh base && \
-/tmp/build/add-packages.sh base && \
-sed -i 's/#AutomaticUpdatePolicy.*/AutomaticUpdatePolicy=stage/' /etc/rpm-ostreed.conf && \
-systemctl enable rpm-ostreed-automatic.timer && \
+RUN rpm-ostree install \
+  https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_VERSION}.noarch.rpm \
+  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${FEDORA_VERSION}.noarch.rpm
+
+RUN rpm-ostree override remove \
+firefox \
+firefox-langpacks
+
+RUN rpm-ostree install \
+adw-gtk3-theme \
+distrobox \
+fish \
+gnome-tweaks \
+starship \
+steam-devices \
+tailscale
+
+RUN systemctl enable rpm-ostreed-automatic.timer && \
 systemctl enable tailscaled
 
-RUN /tmp/build/install-google-fonts.sh base && \
-/tmp/build/install-nerd-fonts.sh base
+RUN /tmp/install-google-fonts.sh base && \
+/tmp/install-nerd-fonts.sh base
 
 RUN rpm-ostree cleanup -m && \
 rm -rf /tmp/* && \
@@ -22,17 +37,21 @@ ostree container commit
 
 FROM silverblue-base as silverblue-framework
 
-RUN mkdir /tmp/build
-COPY scripts/ /tmp/build/
 COPY framework/etc/ /etc/
 
-RUN /tmp/build/remove-packages.sh framework && \
-/tmp/build/add-packages.sh framework && \
-systemctl enable fprintd && \
+RUN rpm-ostree override remove \
+power-profiles-daemon
+
+RUN rpm-ostree install \
+fprintd \
+tlp \
+tlp-rdw \
+powertop
+
+RUN systemctl enable fprintd && \
 systemctl enable tlp
 
 RUN rpm-ostree cleanup -m && \
-rm -rf /tmp/* && \
 ostree container commit
 
 FROM registry.fedoraproject.org/fedora-toolbox:${FEDORA_VERSION} as dev-toolbox
