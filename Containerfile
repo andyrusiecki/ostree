@@ -27,8 +27,7 @@ tailscale
 RUN systemctl enable rpm-ostreed-automatic.timer && \
 systemctl enable tailscaled
 
-RUN /tmp/install-google-fonts.sh base && \
-/tmp/install-nerd-fonts.sh base
+RUN /tmp/install-fonts.sh
 
 RUN rpm-ostree cleanup -m && \
 rm -rf /tmp/* && \
