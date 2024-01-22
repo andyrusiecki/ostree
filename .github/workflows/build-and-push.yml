@@ -3,8 +3,8 @@ name: Build and Push Images
 on:
   push:
     branches: [ "main" ]
-  #schedule:
-  #- cron: '0 15 * * *'
+  schedule:
+  - cron: '0 15 * * *'
 
 jobs:
   build-images:
@@ -30,19 +30,7 @@ jobs:
         image_base="ghcr.io/andyrusiecki/${{ matrix.image }}"
 
         docker build . --file Containerfile --target ${{ matrix.image }} --tag ${image_base}:${build_date}
-
-        digest=$(docker image inspect --format json ${image_base}:${build_date} | jq -r '.[0].Id')
-        latest_digest=$(docker manifest inspect ${image_base}:latest | jq -r '.config.digest')
-
-        echo "Comparing image digests:"
-        echo "> ${build_date} = ${digest}"
-        echo "> latest = ${latest_digest}"
-
-        if [[ "$digest" != "$latest_digest" ]]; then
-          echo "Tagging and pushing new image"
-
-          docker tag ${image_base}:${build_date} ${image_base}:latest
-          docker push --all-tags ${image_base}
-        fi
+        docker tag ${image_base}:${build_date} ${image_base}:latest
+        docker push --all-tags ${image_base}
 
 
