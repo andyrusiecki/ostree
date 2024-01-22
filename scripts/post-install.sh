@@ -1,12 +1,27 @@
 #!/bin/bash
 
-image="$1"
+if [ "$UID" = "0" ]; then
+  echo "This script cannot be run as root! It will prompt for user password with sudo when root permissions are required."
+  exit 1
+fi
+
+image=$(rpm-ostree status --json | jq -r '.deployments[] | select(.boot == true) | .["container-image-reference"]' | grep -oP --color=never '(?<=andyrusiecki/).*(?=:)')
+
+echo "Detected base image '$image'"
 
 # Replace fedora flatpak repo with flathub (https://www.reddit.com/r/Fedora/comments/z2kk88/fedora_silverblue_replace_the_fedora_flatpak_repo/)
-sudo flatpak remote-modify --no-filter --enable flathub
-flatpak remove --noninteractive --assumeyes org.fedoraproject.MediaWriter
-flatpak install --noninteractive --assumeyes --reinstall flathub $(flatpak list --app-runtime=org.fedoraproject.Platform --columns=application | tail -n +1 )
-sudo flatpak remote-delete fedora
+if ! flatpak remotes | grep flathub &>/dev/null; then
+  sudo flatpak remote-modify --no-filter --enable flathub
+fi
+
+if ! flatpak info org.fedoraproject.MediaWriter &>/dev/null; then
+  flatpak remove --noninteractive --assumeyes org.fedoraproject.MediaWriter
+fi
+
+if flatpak remotes | grep fedora &>/dev/null; then
+  flatpak install --noninteractive --assumeyes --reinstall flathub $(flatpak list --app-runtime=org.fedoraproject.Platform --columns=application | tail -n +1 )
+  sudo flatpak remote-delete fedora
+fi
 
 # Install Default Flatpaks and Extensions
 function getFlatpakExtension() {
@@ -34,18 +49,20 @@ flatpak_apps=(
   io.github.celluloid_player.Celluloid
   io.github.realmazharhussain.GdmSettings
   md.obsidian.Obsidian
-  org.Gnome.Boxes
+  org.gnome.Boxes
   org.gnome.World.PikaBackup
   org.gtk.Gtk3theme.adw-gtk3
   org.gtk.Gtk3theme.adw-gtk3-ark
   org.libreoffice.LibreOffice
-  org.mozilla.firefox
-  $(getFlatpakExtension org.mozilla.firefox org.freedesktop.Platform.ffmpeg-full)
+  app/org.mozilla.firefox/$(arch)/stable
   org.signal.Signal
   us.zoom.Zoom
 )
 
 flatpak install --noninteractive ${flatpak_apps[@]}
+
+# ffmpeg firefox extension
+flatpak install --noninteractive $(getFlatpakExtension org.mozilla.firefox org.freedesktop.Platform.ffmpeg-full)
 
 # Gnome Extensions
 # TODO: replace some with Just Perfection with donf settings
@@ -63,8 +80,14 @@ extensions=(
   Vitals@CoreCoding.com
 )
 
+shell_version=$(gnome-shell --version | cut -d' ' -f3)
+
 for uuid in ${extensions[@]}
 do
+  if gnome-extensions info $uuid &>/dev/null; then
+    break
+  fi
+
   info_json=$(curl -sS "https://extensions.gnome.org/extension-info/?uuid=$uuid&shell_version=$shell_version")
   download_url=$(echo $info_json | jq ".download_url" --raw-output)
 
@@ -113,10 +136,12 @@ systemctl --user enable --now podman.socket
 sudo usermod -s $(command -v fish) $USER
 
 # create dev distrobox
-distrobox create --name dev --image ghcr.io/andyrusiecki/dev-sandbox:latest
+if ! distrobox ls | grep andyrusiecki/dev-toolbox &>/dev/null; then
+  distrobox create --name dev --image ghcr.io/andyrusiecki/dev-toolbox:latest
+fi
 
 # framework specific options
-if [[ "$image" = "framework" ]]; then
+if [[ "$image" = "silverblue-framework" ]]; then
   # gnome settings
   gsettings set org.gnome.desktop.interface text-scaling-factor 1.25
   gsettings set org.gnome.mutter experimental-features "['scale-monitor-framebuffer']"
@@ -129,5 +154,7 @@ if [[ "$image" = "framework" ]]; then
   flatpak install --noninteractive ${flatpak_apps[@]}
 
   # enable birghtness keys
-  sudo rpm-ostree kargs --append="module_blacklist=hid_sensor_hub"
+  if ! rpm-ostree kargs | grep module_blacklist=hid_sensor_hub &>/dev/null; then
+    sudo rpm-ostree kargs --append="module_blacklist=hid_sensor_hub"
+  fi
 fi
