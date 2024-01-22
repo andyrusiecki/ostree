@@ -5,20 +5,20 @@ if [ "$UID" = "0" ]; then
   exit 1
 fi
 
-image=$(rpm-ostree status --json | jq -r '.deployments[] | select(.boot == true) | .["container-image-reference"]' | grep -oP --color=never '(?<=andyrusiecki/).*(?=:)')
+image=$(rpm-ostree status --json | jq -r '.deployments[] | select(.booted == true) | .["container-image-reference"]' | grep -oP --color=never '(?<=andyrusiecki/).*(?=:)')
 
 echo "Detected base image '$image'"
 
 # Replace fedora flatpak repo with flathub (https://www.reddit.com/r/Fedora/comments/z2kk88/fedora_silverblue_replace_the_fedora_flatpak_repo/)
-if ! flatpak remotes | grep flathub &>/dev/null; then
+if ! flatpak remotes | grep --quiet flathub; then
   sudo flatpak remote-modify --no-filter --enable flathub
 fi
 
-if ! flatpak info org.fedoraproject.MediaWriter &>/dev/null; then
+if flatpak info org.fedoraproject.MediaWriter &>/dev/null; then
   flatpak remove --noninteractive --assumeyes org.fedoraproject.MediaWriter
 fi
 
-if flatpak remotes | grep fedora &>/dev/null; then
+if flatpak remotes | grep --quiet fedora; then
   flatpak install --noninteractive --assumeyes --reinstall flathub $(flatpak list --app-runtime=org.fedoraproject.Platform --columns=application | tail -n +1 )
   sudo flatpak remote-delete fedora
 fi
@@ -28,9 +28,9 @@ function getFlatpakExtension() {
   app="$1"
   ext="$2"
 
-  version="$(flatpak info -m $app | sed -n "/^[ \t]*\[$ext\]/,/\[/s/^[ \t]*version[ \t]*=[ \t]*//p")"
+  version="$(flatpak info -m $app | sed -n "/^[ \t]*\[Extension $ext\]/,/\[/s/^[ \t]*version[ \t]*=[ \t]*//p")"
 
-  echo "runtime/$app/$(arch)/$version"
+  echo "runtime/$ext/$(arch)/$version"
 }
 
 flatpak_apps=(
@@ -52,7 +52,7 @@ flatpak_apps=(
   org.gnome.Boxes
   org.gnome.World.PikaBackup
   org.gtk.Gtk3theme.adw-gtk3
-  org.gtk.Gtk3theme.adw-gtk3-ark
+  org.gtk.Gtk3theme.adw-gtk3-dark
   org.libreoffice.LibreOffice
   app/org.mozilla.firefox/$(arch)/stable
   org.signal.Signal
@@ -84,14 +84,19 @@ shell_version=$(gnome-shell --version | cut -d' ' -f3)
 
 for uuid in ${extensions[@]}
 do
-  if gnome-extensions info $uuid &>/dev/null; then
+  if gnome-extensions list | grep --quiet $uuid; then
     break
   fi
 
   info_json=$(curl -sS "https://extensions.gnome.org/extension-info/?uuid=$uuid&shell_version=$shell_version")
   download_url=$(echo $info_json | jq ".download_url" --raw-output)
 
-  gnome-extensions install "https://extensions.gnome.org$download_url"
+  gnome-extensions install --force "https://extensions.gnome.org$download_url"
+
+  if ! gnome-extensions list | grep --quiet $uuid; then
+    busctl --user call org.gnome.Shell.Extensions /org/gnome/Shell/Extensions org.gnome.Shell.Extensions InstallRemoteExtension s $uuid
+  fi
+
   gnome-extensions enable $uuid
 done
 
@@ -133,10 +138,14 @@ gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'org
 systemctl --user enable --now podman.socket
 
 # make fish the default shell
-sudo usermod -s $(command -v fish) $USER
+new_shell="$(command -v fish)"
+current_shell="$(getent passwd $USER | awk -F : '{ print $7 }')"
+if [[ "$new_shell" != "$current_shell" ]]; then
+  sudo usermod -s $new_shell $USER
+fi
 
 # create dev distrobox
-if ! distrobox ls | grep andyrusiecki/dev-toolbox &>/dev/null; then
+if ! distrobox ls | grep --quiet andyrusiecki/dev-toolbox; then
   distrobox create --name dev --image ghcr.io/andyrusiecki/dev-toolbox:latest
 fi
 
@@ -154,7 +163,7 @@ if [[ "$image" = "silverblue-framework" ]]; then
   flatpak install --noninteractive ${flatpak_apps[@]}
 
   # enable birghtness keys
-  if ! rpm-ostree kargs | grep module_blacklist=hid_sensor_hub &>/dev/null; then
+  if ! rpm-ostree kargs | grep --quiet module_blacklist=hid_sensor_hub; then
     sudo rpm-ostree kargs --append="module_blacklist=hid_sensor_hub"
   fi
 fi
