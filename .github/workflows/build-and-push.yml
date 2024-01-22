@@ -41,8 +41,8 @@ jobs:
         if [[ "$digest" != "$latest_digest" ]]; then
           echo "Tagging and pushing new image"
 
-          podman tag ${image_base}:${build_date} ${image_base}:latest
-          podman push --all-tags ${image_base}
+          docker tag ${image_base}:${build_date} ${image_base}:latest
+          docker push --all-tags ${image_base}
         fi
 
 
