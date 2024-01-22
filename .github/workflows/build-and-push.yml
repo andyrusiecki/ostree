@@ -7,35 +7,36 @@ on:
   #- cron: '0 15 * * *'
 
 jobs:
-
-  build:
-
+  build-images:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: [
+          'silverblue-base',
+          'silverblue-framework',
+          'dev-toolbox'
+        ]
 
     steps:
     - name: 'Checkout Github Action'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: 'Login to GitHub Container Registry'
-      uses: docker/login-action@v1
-      with:
-        registry: ghcr.io
-        username: ${{github.actor}}
-        password: ${{secrets.GITHUB_TOKEN}}
+      run: 'echo ${{secrets.GITHUB_TOKEN}} | podman login ghcr.io -u ${{github.actor}} --password-stdin'
 
-    - name: 'Build and Push Docker Images'
+    - name: 'Build and Push Images'
       run: |
         build_date=$(date +%s)
-        images=(
-          silverblue-base
-          silverblue-framework
-          dev-toolbox
-        )
+        image_base="ghcr.io/andyrusiecki/${{ matrix.image }}"
 
-        for image in ${images[@]}
-        do
-          docker build . --file Containerfile --target $image --tag ghcr.io/andyrusiecki/${image}:${build_date}
-          docker tag ghcr.io/andyrusiecki/${image}:${build_date} ghcr.io/andyrusiecki/${image}:latest
-          docker push --all-tags ghcr.io/andyrusiecki/${image}
-        done
+        podman build . --target ${{ matrix.image }} --tag ${image_base}:${build_date}
+
+        digest=$(podman manifest inspect ${image_base}:${build_date} | jq '.config.digest')
+        latest_digest=$(podman manifest inspect ${image_base}:latest | jq '.config.digest')
+
+        if [[ "$digest" != "$latest_digest" ]]; then
+          podman tag ${image_base}:${build_date} ${image_base}:latest
+          podman push --all-tags ${image_base}
+        fi
+
 
