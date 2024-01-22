@@ -31,8 +31,8 @@ jobs:
 
         podman build . --target ${{ matrix.image }} --tag ${image_base}:${build_date}
 
-        digest=$(podman manifest inspect ${image_base}:${build_date} | jq '.config.digest')
-        latest_digest=$(podman manifest inspect ${image_base}:latest | jq '.config.digest')
+        digest=$(podman image inspect --format json ${image_base}:${build_date} | jq -r '.[0].Id')
+        latest_digest=$(podman manifest inspect ${image_base}:latest | jq -r '.config.digest')
 
         if [[ "$digest" != "$latest_digest" ]]; then
           podman tag ${image_base}:${build_date} ${image_base}:latest
