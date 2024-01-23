@@ -4,7 +4,7 @@ FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_VERSION} as silverblue-b
 
 COPY base/etc/ /etc/
 COPY base/usr/ /usr/
-COPY base/tmp/ /usr/
+COPY base/tmp/ /tmp/
 
 RUN rpm-ostree install \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
@@ -12,7 +12,8 @@ RUN rpm-ostree install \
 
 RUN rpm-ostree override remove \
   firefox \
-  firefox-langpacks
+  firefox-langpacks \
+  toolbox
 
 RUN rpm-ostree install \
   adw-gtk3-theme \
