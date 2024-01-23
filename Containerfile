@@ -2,9 +2,7 @@ ARG FEDORA_VERSION="39"
 
 FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_VERSION} as silverblue-base
 
-COPY base/etc/ /etc/
-COPY base/usr/ /usr/
-COPY base/tmp/ /tmp/
+COPY base/ /
 
 RUN rpm-ostree install \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
@@ -36,8 +34,7 @@ RUN rpm-ostree cleanup -m && \
 
 FROM silverblue-base as silverblue-framework
 
-COPY framework/etc/ /etc/
-COPY framework/usr/ /usr/
+COPY framework/ /
 
 RUN rpm-ostree override remove \
   power-profiles-daemon
@@ -56,7 +53,7 @@ RUN rpm-ostree cleanup -m && \
 
 FROM registry.fedoraproject.org/fedora-toolbox:${FEDORA_VERSION} as dev-toolbox
 
-COPY dev-toolbox/etc/ /etc/
+COPY dev-toolbox/ /
 
 # Set max dnf parallel downloads to 20
 RUN echo "max_parallel_downloads=20" >> /etc/dnf/dnf.conf
