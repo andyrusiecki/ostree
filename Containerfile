@@ -50,6 +50,54 @@ RUN systemctl enable fprintd && \
 RUN rm -rf /tmp/* /var/* && \
   ostree container commit
 
+FROM quay.io/fedora-ostree-desktops/base:${FEDORA_VERSION} as hyprland
+
+RUN rpm-ostree install \
+  bluez \
+  # theming - icons, lxappearance?
+  adw-gtk3-theme \
+  btop \
+  cups \
+  distrobox \
+  dunst \
+  fish \
+  flatpak \
+  grim \
+  slurp \
+  # firewall - firewalld
+  # samba - need to test?
+  hyprland \
+  xdg-desktop-portal-hyprland \
+  xdg-desktop-portal-gtk \
+  # cli tools - imv, ranger, mpv, jq (maybe in container)
+  # displays - kanshi?
+  kitty \
+  # plymouth
+  podman \
+  starship \
+  steam-devices \
+  tailscale \
+  swaybg \
+  swayidle \
+  swaylock \
+  # (swaylock-efects?)
+  thunar \
+  thunar-archive-plugin \
+  thunar-volman \
+  waybar \
+  rofi-wayland \
+  # TODO: more deps from local scripts
+  # framework only
+  light
+
+# TODO: scripts to compile:
+# - bluetuith
+# - grimblast
+
+# if adapting sericea image
+# - remove foot, sway, xdg-desktop-portal-wlr
+# - add kitty + cli tools
+
 FROM registry.fedoraproject.org/fedora-toolbox:${FEDORA_VERSION} as dev-toolbox
 
 COPY overlays/dev-toolbox/ /
