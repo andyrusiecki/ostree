@@ -4,8 +4,7 @@ FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_VERSION} as silverblue-b
 
 COPY base/etc/ /etc/
 COPY base/usr/ /usr/
-
-COPY scripts/install-fonts.sh /tmp/
+COPY base/tmp/ /usr/
 
 RUN rpm-ostree install \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
