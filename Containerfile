@@ -27,9 +27,9 @@ RUN systemctl enable rpm-ostreed-automatic.timer && \
 
 RUN /tmp/install-fonts.sh
 
-RUN rpm-ostree cleanup -m && \
-  rm -rf /tmp/* && \
-  ostree container commit
+RUN rm -rf /tmp/* /var/* && \
+  ostree container commit && \
+  mkdir -p /var/tmp && chmod -R 1777 /tmp /var/tmp
 
 
 FROM silverblue-base as silverblue-framework
@@ -48,8 +48,9 @@ RUN rpm-ostree install \
 RUN systemctl enable fprintd && \
   systemctl enable tlp
 
-RUN rpm-ostree cleanup -m && \
-  ostree container commit
+RUN rm -rf /tmp/* /var/* && \
+  ostree container commit && \
+  mkdir -p /var/tmp && chmod -R 1777 /tmp /var/tmp
 
 FROM registry.fedoraproject.org/fedora-toolbox:${FEDORA_VERSION} as dev-toolbox
 
