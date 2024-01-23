@@ -166,6 +166,13 @@ if [[ "$image" = "silverblue-framework" ]]; then
   gsettings set org.gnome.desktop.interface text-scaling-factor 1.25
   gsettings set org.gnome.mutter experimental-features "['scale-monitor-framebuffer']"
 
+  # default background
+  gsettings set org.gnome.desktop.background picture-uri "file:///usr/share/backgrounds/framework/framework_light.webp"
+  gsettings set org.gnome.desktop.background picture-uri-dark "file:///usr/share/backgrounds/framework/framework_dark.webp"
+  gsettings set org.gnome.desktop.background picture-options "zoom"
+  gsettings set org.gnome.desktop.background primary-color "#C22619"
+  gsettings set org.gnome.desktop.background secondary-color "#122D58"
+
   # install framework specific flatpaks
   flatpak_apps=(
     com.github.d4nj1.tlpui
