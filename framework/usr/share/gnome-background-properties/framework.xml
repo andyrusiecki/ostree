@@ -3,8 +3,8 @@
 <wallpapers>
   <wallpaper deleted="false">
     <name>Framework</name>
-    <filename>/usr/share/backgrounds/framework/framework-l.webp</filename>
-    <filename-dark>/usr/share/backgrounds/framework/framework-d.webp</filename-dark>
+    <filename>/usr/share/backgrounds/framework/framework_light.webp</filename>
+    <filename-dark>/usr/share/backgrounds/framework/framework_dark.webp</filename-dark>
     <options>zoom</options>
     <shade_type>solid</shade_type>
     <pcolor>#C22619</pcolor>
