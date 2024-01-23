@@ -71,10 +71,9 @@ extensions=(
   appindicatorsupport@rgcjonas.gmail.com
   blur-my-shell@aunetx
   caffeine@patapon.info
+  just-perfection-desktop@just-perfection
   mediacontrols@cliffniff.github.com
   nightthemeswitcher@romainvigier.fr
-  no-overview@fthx
-  notification-banner-reloaded@marcinjakubowski.github.com
   pip-on-top@rafostar.github.com
   user-theme@gnome-shell-extensions.gcampax.github.com
   Vitals@CoreCoding.com
@@ -133,6 +132,18 @@ gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled true
 gsettings set org.gnome.system.location enabled true
 
 gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'org.mozilla.firefox.desktop', 'com.google.Chrome.desktop', 'com.spotify.Client.desktop', 'com.valvesoftware.Steam.desktop', 'com.slack.Slack.desktop', 'md.obsidian.Obsidian.desktop', 'com.visualstudio.code.desktop', 'org.gnome.Terminal.desktop']"
+
+# Gnome Extension settings
+## Just Perfection
+gsettings set org.gnome.shell.extensions.just-perfection notification-banner-position 2 # top end
+gsettings set org.gnome.shell.extensions.just-perfection startup-status 0 # no overview at startup
+
+# Media Controls
+gsettings set org.gnome.shell.extensions.mediacontrols extension-index 1
+gsettings set org.gnome.shell.extensions.mediacontrols extension-position "Left"
+gsettings set org.gnome.shell.extensions.mediacontrols show-control-icons-seek-backward false
+gsettings set org.gnome.shell.extensions.mediacontrols show-control-icons-seek-forward false
+
 
 # Enable podman socket for user
 systemctl --user enable --now podman.socket

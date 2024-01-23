@@ -2,88 +2,64 @@ ARG FEDORA_VERSION="39"
 
 FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_VERSION} as silverblue-base
 
-COPY etc/ /etc/
+COPY base/etc/ /etc/
+COPY base/usr/ /usr/
+
 COPY scripts/install-fonts.sh /tmp/
-RUN mkdir -p /usr/share/andyrusiecki
-COPY scripts/post-install.sh /usr/share/andyrusiecki
 
 RUN rpm-ostree install \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
   https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
 RUN rpm-ostree override remove \
-firefox \
-firefox-langpacks
+  firefox \
+  firefox-langpacks
 
 RUN rpm-ostree install \
-adw-gtk3-theme \
-distrobox \
-fish \
-gnome-tweaks \
-starship \
-steam-devices \
-tailscale
+  adw-gtk3-theme \
+  distrobox \
+  fish \
+  gnome-tweaks \
+  starship \
+  steam-devices \
+  tailscale
 
 RUN systemctl enable rpm-ostreed-automatic.timer && \
-systemctl enable tailscaled
+  systemctl enable tailscaled
 
 RUN /tmp/install-fonts.sh
 
 RUN rpm-ostree cleanup -m && \
-rm -rf /tmp/* && \
-ostree container commit
+  rm -rf /tmp/* && \
+  ostree container commit
 
 
 FROM silverblue-base as silverblue-framework
 
 COPY framework/etc/ /etc/
+COPY framework/usr/ /usr/
 
 RUN rpm-ostree override remove \
-power-profiles-daemon
+  power-profiles-daemon
 
 RUN rpm-ostree install \
-fprintd \
-tlp \
-tlp-rdw \
-powertop
+  fprintd \
+  tlp \
+  tlp-rdw \
+  powertop
 
 RUN systemctl enable fprintd && \
-systemctl enable tlp
+  systemctl enable tlp
 
 RUN rpm-ostree cleanup -m && \
-ostree container commit
+  ostree container commit
 
 FROM registry.fedoraproject.org/fedora-toolbox:${FEDORA_VERSION} as dev-toolbox
 
+COPY dev-toolbox/etc/ /etc/
+
 # Set max dnf parallel downloads to 20
 RUN echo "max_parallel_downloads=20" >> /etc/dnf/dnf.conf
-
-# Add Kubernetes repo
-RUN echo $'[kubernetes] \n\
-name=Kubernetes \n\
-baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch \n\
-enabled=1 \n\
-gpgcheck=1 \n\
-gpgkey=https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg \n\
-' > /etc/yum.repos.d/kubernetes.repo
-
-# Add starship copr repo
-RUN echo $'[starship]\n\
-name=Starship \n\
-baseurl=https://download.copr.fedorainfracloud.org/results/atim/starship/fedora-$releasever-$basearch/ \n\
-type=rpm-md \n\
-skip_if_unavailable=True \n\
-gpgcheck=1 \n\
-gpgkey=https://download.copr.fedorainfracloud.org/results/atim/starship/pubkey.gpg \n\
-repo_gpgcheck=0 \n\
-enabled=1 \n\
-enabled_metadata=1 \n\
-' > /etc/yum.repos.d/starship.repo
-
-# Set DOCKER_HOST env var for host podman socket
-RUN echo $'# /etc/profile.d/podman-host.sh - sets Podman and Docker host.\n\
-export DOCKER_HOST="unix:///run/user/1000/podman/podman.sock"\n\
-' > /etc/profile.d/podman-host.sh && chmod 644 /etc/profile.d/podman-host.sh
 
 # add symlinks to host for podman
 RUN ln -s /usr/bin/distrobox-host-exec /usr/local/bin/podman
