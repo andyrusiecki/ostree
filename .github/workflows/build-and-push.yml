@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
   schedule:
-  - cron: '0 15 * * *'
+  - cron: '0 15 * * 6'
 
 jobs:
   build-images:
@@ -12,8 +12,8 @@ jobs:
     strategy:
       matrix:
         image: [
-          'silverblue-base',
-          'silverblue-framework',
+          'variscite-gnome',
+          'variscite-gnome-framework',
           'dev-toolbox'
         ]
 

@@ -1,8 +1,8 @@
 ARG FEDORA_VERSION="39"
 
-FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_VERSION} as silverblue-base
+FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_VERSION} as variscite-gnome
 
-COPY base/ /
+COPY overlay-files/gnome/ /
 
 RUN rpm-ostree install \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
@@ -31,9 +31,9 @@ RUN rm -rf /tmp/* /var/* && \
   ostree container commit
 
 
-FROM silverblue-base as silverblue-framework
+FROM variscite-gnome as variscite-gnome-framework
 
-COPY framework/ /
+COPY overlay-files/framework/ /
 
 RUN rpm-ostree override remove \
   power-profiles-daemon
@@ -52,7 +52,7 @@ RUN rm -rf /tmp/* /var/* && \
 
 FROM registry.fedoraproject.org/fedora-toolbox:${FEDORA_VERSION} as dev-toolbox
 
-COPY dev-toolbox/ /
+COPY overlay-files/dev-toolbox/ /
 
 # Set max dnf parallel downloads to 20
 RUN echo "max_parallel_downloads=20" >> /etc/dnf/dnf.conf
