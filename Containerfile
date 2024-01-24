@@ -50,53 +50,57 @@ RUN systemctl enable fprintd && \
 RUN rm -rf /tmp/* /var/* && \
   ostree container commit
 
-FROM quay.io/fedora-ostree-desktops/base:${FEDORA_VERSION} as hyprland
+FROM quay.io/fedora-ostree-desktops/sericea:${FEDORA_VERSION} as hyprland
+
+COPY base/ /
 
 RUN rpm-ostree install \
-  bluez \
+  https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
+RUN rpm-ostree override remove \
+  firefox \
+  firefox-langpacks \
+  foot \
+  sway \
+  toolbox \
+  xdg-desktop-portal-wlr
+
+RUN rpm-ostree install \
+  adw-gtk3-theme \
+  distrobox \
+  fish \
+  starship \
+  steam-devices \
+  tailscale
+
+RUN rpm-ostree install \
   # theming - icons, lxappearance?
   adw-gtk3-theme \
+  adwaita-icon-theme \
+  adwaita-cursor-theme \
   btop \
   cups \
   distrobox \
-  dunst \
   fish \
-  flatpak \
-  grim \
-  slurp \
-  # firewall - firewalld
-  # samba - need to test?
   hyprland \
   xdg-desktop-portal-hyprland \
   xdg-desktop-portal-gtk \
-  # cli tools - imv, ranger, mpv, jq (maybe in container)
-  # displays - kanshi?
+  kanshi \
   kitty \
-  # plymouth
-  podman \
   starship \
   steam-devices \
   tailscale \
-  swaybg \
-  swayidle \
-  swaylock \
-  # (swaylock-efects?)
-  thunar \
-  thunar-archive-plugin \
-  thunar-volman \
-  waybar \
-  rofi-wayland \
-  # TODO: more deps from local scripts
-  # framework only
-  light
+  # (swaylock-effects?)
 
 # TODO: scripts to compile:
 # - bluetuith
 # - grimblast
 
-# if adapting sericea image
-# - remove foot, sway, xdg-desktop-portal-wlr
-# - add kitty + cli tools
+# TODO:
+# - rm /usr/share/sway, /usr/share/sway-systemd, /etc/sway (might be a systemd service too)
+# - update /etc/swaylock
+# - remove sddm (replace with getty launch), rm etc/sddm and etc/sddm.conf
 
 FROM registry.fedoraproject.org/fedora-toolbox:${FEDORA_VERSION} as dev-toolbox
 
