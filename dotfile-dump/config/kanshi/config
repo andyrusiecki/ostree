@@ -1,0 +1,45 @@
+profile laptop-only {
+	output eDP-1 mode 2256x1504@60 position 0,0 scale 1.25
+	exec ~/.config/hypr/scripts/set-workspace-monitors.sh
+}
+
+profile home {
+	output "GIGA-BYTE TECHNOLOGY CO., LTD. M27Q X 22400B001696" mode 2560x1440@60 position 0,0 scale 1
+	output "eDP-1" mode 2256x1504@60 position 2560,0 scale 1.25
+	exec ~/.config/hypr/scripts/set-workspace-monitors.sh
+}
+
+profile home-closed-laptop {
+        output "GIGA-BYTE TECHNOLOGY CO., LTD. M27Q X 22400B001696" mode 2560x1440@60 position 0,0 scale 1
+        exec ~/.config/hypr/scripts/set-workspace-monitors.sh
+}
+
+profile work-nyc-1 {
+	output "Dell Inc. DELL SE2722HX G8W6LW3" mode 1920x1080 position 0,0 scale 1
+	output "eDP-1" mode 2256x1504@60 position 1920,0 scale 1.25
+        exec ~/.config/hypr/scripts/set-workspace-monitors.sh
+}
+
+profile work-nyc-2 {
+        output "Dell Inc. DELL S2440L C9VNT38Q0KKQ" mode 1920x1080 position 0,0 scale 1
+        output "eDP-1" mode 2256x1504@60 position 1920,0 scale 1.25
+        exec ~/.config/hypr/scripts/set-workspace-monitors.sh
+}
+
+profile work-nyc-3 {
+        output "Dell Inc. DELL SE2722HX GK46LW3" mode 1920x1080 position 0,0 scale 1
+        output "eDP-1" mode 2256x1504@60 position 1920,0 scale 1.25
+        exec ~/.config/hypr/scripts/set-workspace-monitors.sh
+}
+
+profile work-nyc-4 {
+        output "Acer Technologies SB240Y 0x232017DF" mode 1920x1080 position 0,0 scale 1
+        output "eDP-1" mode 2256x1504@60 position 1920,0 scale 1.25
+        exec ~/.config/hypr/scripts/set-workspace-monitors.sh
+}
+
+profile work-nyc-5 {
+        output "Acer Technologies Acer KA240H T6NAA0014200" mode 1920x1080 position 0,0 scale 1
+        output "eDP-1" mode 2256x1504@60 position 1920,0 scale 1.25
+        exec ~/.config/hypr/scripts/set-workspace-monitors.sh
+}
