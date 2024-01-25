@@ -50,9 +50,9 @@ RUN systemctl enable fprintd && \
 RUN rm -rf /tmp/* /var/* && \
   ostree container commit
 
-FROM quay.io/fedora-ostree-desktops/sericea:${FEDORA_VERSION} as hyprland
+FROM quay.io/fedora-ostree-desktops/sericea:${FEDORA_VERSION} as variscite-hyprland
 
-COPY base/ /
+COPY overlay-files/shared/ /
 
 RUN rpm-ostree install \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
@@ -90,7 +90,7 @@ RUN rpm-ostree install \
   kitty \
   starship \
   steam-devices \
-  tailscale \
+  tailscale
   # (swaylock-effects?)
 
 # TODO: scripts to compile:
