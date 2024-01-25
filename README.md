@@ -1,10 +1,10 @@
-# Variscite - OSTree based custom desktop environments
+# Malachite - OSTree based custom desktop environments
 
 This repository holds custom images for my own ostree desktop environments.
 
 Images are rebuilt with new changes on each new commit in the main branch. New images are also created every Saturday for new base image updates.
 
-The name Variscite is based on a [green mineral](https://en.wikipedia.org/wiki/Variscite). This is meant to similar, though different in color, from Fedora's blue immutable desktop names.
+The name malachite is based on a [green mineral](https://en.wikipedia.org/wiki/Malachite). This is meant to similar, though different in color, from Fedora's blue immutable desktop names.
 
 ## Desktop Builds
 
@@ -12,11 +12,11 @@ Rebasing to one of these image can be done by running:
 ```bash
 rpm-ostree rebase ostree-unverified-registry:ghcr.io/andyrusiecki/<image name>
 ```
-### Gnome -> variscite-gnome
+### Gnome -> malachite-gnome
 Customized [Fedora Silverblue](https://fedoraproject.org/silverblue/) image with my updated package requirements and extensions.
 
-### Gnome for Framework 13 laptop (12th Gen Intel) -> variscite-gnome-framework
-Extended variscite-gnome image with added customizations for the Framework 13 (12th Gen Intel) laptop.
+### Gnome for Framework 13 laptop (12th Gen Intel) -> malachite-gnome-framework
+Extended malachite-gnome image with added customizations for the Framework 13 (12th Gen Intel) laptop.
 
 ## Other Builds
 

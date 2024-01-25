@@ -12,8 +12,8 @@ jobs:
     strategy:
       matrix:
         image: [
-          'variscite-gnome',
-          'variscite-gnome-framework',
+          'malachite-gnome',
+          'malachite-gnome-framework',
           'dev-toolbox'
         ]
 

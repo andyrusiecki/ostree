@@ -1,6 +1,6 @@
 ARG FEDORA_VERSION="39"
 
-FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_VERSION} as variscite-gnome
+FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_VERSION} as malachite-gnome
 
 COPY overlay-files/gnome/ /
 
@@ -31,7 +31,7 @@ RUN rm -rf /tmp/* /var/* && \
   ostree container commit
 
 
-FROM variscite-gnome as variscite-gnome-framework
+FROM malachite-gnome as malachite-gnome-framework
 
 COPY overlay-files/framework/ /
 
