@@ -50,7 +50,7 @@ RUN systemctl enable fprintd && \
 RUN rm -rf /tmp/* /var/* && \
   ostree container commit
 
-FROM quay.io/fedora-ostree-desktops/sericea:${FEDORA_VERSION} as variscite-hyprland
+FROM quay.io/fedora-ostree-desktops/sericea:${FEDORA_VERSION} as malachite-hyprland
 
 COPY overlay-files/shared/ /
 
