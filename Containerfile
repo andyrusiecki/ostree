@@ -52,7 +52,7 @@ RUN rm -rf /tmp/* /var/* && \
 
 FROM registry.fedoraproject.org/fedora-toolbox:${FEDORA_VERSION} as dev-toolbox
 
-COPY overlay-files/dev-toolbox/ /
+COPY overlays/dev-toolbox/ /
 
 # Set max dnf parallel downloads to 20
 RUN echo "max_parallel_downloads=20" >> /etc/dnf/dnf.conf
