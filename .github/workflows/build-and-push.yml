@@ -12,8 +12,8 @@ jobs:
     strategy:
       matrix:
         image: [
-          'malachite-gnome',
-          'malachite-gnome-framework',
+          'silverblue',
+          'silverblue-framework',
           'dev-toolbox'
         ]
 

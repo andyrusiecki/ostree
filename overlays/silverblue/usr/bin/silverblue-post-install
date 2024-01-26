@@ -6,8 +6,8 @@ if [ "$UID" = "0" ]; then
 fi
 
 image_name=$(rpm-ostree status --json | jq -r '.deployments[] | select(.booted == true) | .["container-image-reference"]' | grep -oP --color=never '(?<=andyrusiecki/).*(?=:)')
-desktop_name=$(echo $image_name | awk -F '-' '{ print $2 }')
-hardware_name=$(echo $image_name | awk -F '-' '{ print $3 }')
+desktop_name=$(echo $image_name | awk -F '-' '{ print $1 }')
+hardware_name=$(echo $image_name | awk -F '-' '{ print $2 }')
 
 echo "Detected image '$image_name'"
 echo " - desktop = '$desktop_name'"

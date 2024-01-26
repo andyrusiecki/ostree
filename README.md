@@ -1,10 +1,8 @@
-# Malachite - OSTree based custom desktop environments
+# OSTree based custom desktop environments
 
 This repository holds custom images for my own ostree desktop environments.
 
 Images are rebuilt with new changes on each new commit in the main branch. New images are also created every Saturday for new base image updates.
-
-The name malachite is based on a [green mineral](https://en.wikipedia.org/wiki/Malachite). This is meant to similar, though different in color, from Fedora's blue immutable desktop names.
 
 ## Desktop Builds
 
@@ -12,11 +10,15 @@ Rebasing to one of these image can be done by running:
 ```bash
 rpm-ostree rebase ostree-unverified-registry:ghcr.io/andyrusiecki/<image name>
 ```
-### Gnome -> malachite-gnome
+### Gnome
+
+Image name = `silverblue`
 Customized [Fedora Silverblue](https://fedoraproject.org/silverblue/) image with my updated package requirements and extensions.
 
-### Gnome for Framework 13 laptop (12th Gen Intel) -> malachite-gnome-framework
-Extended malachite-gnome image with added customizations for the Framework 13 (12th Gen Intel) laptop.
+### Gnome for Framework 13 laptop (12th Gen Intel)
+
+Image name = `silverblue-framework`
+Extended silverblue image with added customizations for the Framework 13 (12th Gen Intel) laptop.
 
 ## Other Builds
 

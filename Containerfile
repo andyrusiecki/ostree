@@ -1,8 +1,8 @@
 ARG FEDORA_VERSION="39"
 
-FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_VERSION} as malachite-gnome
+FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_VERSION} as silverblue
 
-COPY overlay-files/gnome/ /
+COPY overlays/silverblue/ /
 
 RUN rpm-ostree install \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
@@ -31,9 +31,9 @@ RUN rm -rf /tmp/* /var/* && \
   ostree container commit
 
 
-FROM malachite-gnome as malachite-gnome-framework
+FROM silverblue as silverblue-framework
 
-COPY overlay-files/framework/ /
+COPY overlays/silverblue-framework/ /
 
 RUN rpm-ostree override remove \
   power-profiles-daemon
