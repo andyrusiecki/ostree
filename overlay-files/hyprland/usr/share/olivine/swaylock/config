@@ -1,0 +1,50 @@
+daemonize
+
+ignore-empty-password
+hide-keyboard-layout
+disable-caps-lock-text
+
+clock
+timestr=%I:%M %p
+datestr=%a, %B %e
+
+screenshots
+
+fade-in=0.2
+
+effect-blur=20x2
+effect-scale=0.3
+
+indicator
+indicator-radius=110
+indicator-thickness=4
+
+# Colors
+key-hl-color=#d79921
+# bs-hl-color=wrong-color
+separator-color=#00000000
+
+# Base
+text-color=#a89984
+inside-color=#282828
+ring-color=#cc241d
+line-color=#00000000
+
+
+# Clear
+#text-clear-color=clear-color
+inside-clear-color=#282828
+#ring-clear-color=clear-color
+line-clear-color=#00000000
+
+# Verify
+text-ver-color=#00000000
+inside-ver-color=#282828
+ring-ver-color=#cc241d
+line-ver-color=#00000000
+
+# Wrong
+#text-wrong-color=wrong-color
+inside-wrong-color=#282828
+#ring-wrong-color=wrong-color
+line-wrong-color=#00000000

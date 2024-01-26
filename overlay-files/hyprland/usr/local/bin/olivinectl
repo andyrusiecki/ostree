@@ -1,0 +1,265 @@
+#!/bin/bash
+
+function audio() {
+  function output_notify() {
+    local is_mute=$(pamixer --get-mute)
+    local value="$(pamixer --get-volume)"
+    local msg="$value%"
+
+    if [ $is_mute == "true" ]; then
+      value="0"
+      msg="muted"
+    fi
+
+    notify-send -e -h string:x-canonical-private-synchronous:volume \
+      -h "int:value:$value" -t 2000 "Volume: ${msg}"
+  }
+
+  function input_notify() {
+    local is_mute=$(pamixer --default-source --get-mute)
+    local value="$(pamixer --default-source --get-volume)"
+    local msg="$value%"
+
+    if [ $is_mute == "true" ]; then
+      value="0"
+      msg="muted"
+    fi
+
+    notify-send -e -h string:x-canonical-private-synchronous:microphone \
+      -h "int:value:$value" -t 2000 "Microphone: ${msg}"
+  }
+
+  case $1 in
+    output)
+      case $2 in
+        get)
+          echo "$(pamixer --get-volume)"
+          ;;
+
+        set)
+          pamixer --set-volume $3
+          output_notify
+          ;;
+
+        increase)
+          pamixer --increase $3
+          output_notify
+          ;;
+
+        decrease)
+          pamixer --decrease $3
+          output_notify
+          ;;
+
+        mute)
+          pamixer --mute
+          output_notify
+          ;;
+
+        unmute)
+          pamixer --unmute
+          output_notify
+          ;;
+
+        toggle-mute)
+          pamixer --toggle-mute
+          output_notify
+          ;;
+        *)
+          echo "TODO: audio output usage"
+          ;;
+      esac
+      ;;
+
+    input)
+      case $2 in
+        get)
+          echo "$(pamixer --default-source --get-volume)"
+          ;;
+
+        set)
+          pamixer --default-source --set-volume $3
+          input_notify
+          ;;
+
+        increase)
+          pamixer --default-source --increase $3
+          input_notify
+          ;;
+
+        decrease)
+          pamixer --default-source --decrease $3
+          input_notify
+          ;;
+
+        mute)
+          pamixer --default-source --mute
+          input_notify
+          ;;
+
+        unmute)
+          pamixer --default-source --unmute
+          input_notify
+          ;;
+
+        toggle-mute)
+          pamixer --default-source --toggle-mute
+          input_notify
+          ;;
+
+        *)
+          echo "TODO: audio input usage"
+          ;;
+      esac
+      ;;
+
+    *)
+      echo "TODO: audio usage"
+      ;;
+  esac
+
+}
+function brightness() {
+  function notify() {
+    local value=$(light)
+    value=${value%%.*}
+
+    notify-send -e -h string:x-canonical-private-synchronous:brightness \
+      -h "int:value:$value" -t 2000 "Brightness: ${value}%"
+  }
+
+  case $1 in
+    get)
+      echo "$(light -G)"
+      ;;
+
+    set)
+      light -S $2
+      notify
+      ;;
+
+    increase)
+      light -A $2
+      notify
+      ;;
+
+    decrease)
+      light -U $2
+      notify
+      ;;
+
+    *)
+      echo "TODO: brightness usage"
+      ;;
+  esac
+}
+
+function color() {
+  #local currentCache="~/.cache/olivine/theme"
+  #local current="$(cat $currentCache | xargs echo -n)"
+
+  function palette() {
+    for ((i=0;i<=15;i++)); do
+      if [ $i -eq 8 ]; then
+        echo ""
+      fi
+      if [ $i -lt 8 ]; then
+        echo -en "\e[4${i}m    \e[0m"
+      else
+        echo -en "\e[48;5;${i}m    \e[0m"
+      fi
+    done
+
+    echo ""
+  }
+
+  case $1 in
+    ""|get)
+      palette
+      ;;
+    set)
+      echo "TODO: setting color scheme"
+      ;;
+    schemes)
+      echo "TODO: list available color schemes"
+      ;;
+    *)
+      echo "TODO: color subcommand usage"
+      ;;
+  esac
+}
+
+function workspaces() {
+  function set_workspaces_to_monitor {
+    local min=$1
+    local max=$2
+    local monitor_id="$3"
+    local monitor_name="$4"
+
+    for ((workspace = $min; workspace <= $max; workspace++)); do
+        is_default=false
+        if [ "$workspace" = "$min" ]; then
+            is_default=true
+        fi
+
+        echo "Workspace $workspace (default: $is_default) on $monitor_id: $monitor_name"
+
+        hyprctl dispatch moveworkspacetomonitor $workspace "$monitor_name" &> /dev/null
+        hyprctl keyword workspace $workspace, monitor:$monitor_name, default:$is_default &> /dev/null
+    done
+  }
+
+  function move_workspaces() {
+    if [ "$monitor_count" != "2" ]; then
+      echo "Found ${monitor_count} monitors instead of 2. This function only supports 2 monitors at this time."
+      exit
+    fi
+
+    hyprctl monitors -j | jq -r '.[] | "\(.id)|\(.name)|\(.description)"' | while IFS=\| read -r monitor_id monitor_name monitor_desc;
+    do
+      if [ "$monitor_name" != "eDP-1" ]; then
+        set_workspaces_to_monitor 1 5 "$monitor_id" "$monitor_name"
+      else
+        if [ "$monitor_count" = "1" ]; then
+          set_workspaces_to_monitor 1 10 "$monitor_id" "$monitor_name"
+        else
+          set_workspaces_to_monitor 6 10 "$monitor_id" "$monitor_name"
+        fi
+      fi
+    done
+  }
+
+  case $1 in
+    status)
+      echo "TODO: workspaces on monitor status"
+      ;;
+    move)
+      move_workspaces
+      ;;
+    *)
+      echo "TODO: workspaces subcommand usage"
+      ;;
+  esac
+}
+
+case $1 in
+  audio)
+    shift
+    audio $@
+    ;;
+  brightness)
+    shift
+    brightness $@
+    ;;
+  color)
+    shift
+    color $@
+    ;;
+  lock-session)
+    swaylock --config /usr/share/olivine/hypr/swaylock/config
+    ;;
+  workspaces)
+    shift
+    workspaces $@
+    ;;
+esac

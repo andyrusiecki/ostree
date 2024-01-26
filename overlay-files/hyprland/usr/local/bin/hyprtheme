@@ -1,0 +1,141 @@
+#!/bin/bash
+
+usage() {
+	echo "$0 [-t <theme>] [-i <wallpaper file>]"
+	exit
+}
+
+while getopts t:i: option; do
+	case "${option}" in
+	t)
+		theme=${OPTARG}
+		;;
+	i)
+		image=${OPTARG}
+		;;
+	*)
+		usage
+		;;
+	esac
+done
+
+if [ -z "$theme" ] && [ -z "$image" ]; then
+	usage
+fi
+
+#wallpaper_cache=$(realpath ~/.config/hypr/wallpaper)
+
+if [ ! -z "$image" ]; then
+	image=$(realpath $image)
+	wal -i $image
+	cp $image $wallpaper_cache
+
+	# reload wallpaper
+	pid=$(ps axf | grep swaybg | grep -v grep | awk '{print $1}')
+	swaybg -m fill -i $wallpaper_cache &
+	disown
+	$(
+		sleep 1
+		kill $pid
+	) &
+	disown
+fi
+
+if [ ! -z "$theme" ]; then
+	wal --theme $theme
+fi
+
+# source wal colors
+source ~/.cache/wal/colors.sh
+
+# hyprland
+hyprctl keyword general:col.active_border "rgb(${color1:1})"
+
+# swaylock
+swaylockconfig=~/.config/swaylock/config
+
+function swaylockColor {
+	sed -i '/'$1'=/s/.*/'$1'='$2'/' $swaylockconfig
+}
+
+swaylockColor ring-color $color1
+swaylockColor ring-ver-color $color1
+swaylockColor key-hl-color $color2
+swaylockColor text-color $foreground
+swaylockColor inside-color $background
+swaylockColor inside-clear-color $background
+swaylockColor inside-ver-color $background
+swaylockColor inside-wrong-color $background
+
+echo "Updated swaylock config."
+
+# waybar
+waybarconfig=~/.config/waybar/modules.jsonc
+
+function waybarColor {
+	sed -Ei 's/('$1'.*?color=\\").*?(\\")/\1'$2'\2/g' $waybarconfig
+}
+
+sed -ri 's/(color=\\").*?(\\")/\1'$color1'\2/g' $waybarconfig
+
+# waybar - calendar
+waybarColor months $color2
+waybarColor days $color3
+waybarColor weeks $color4
+waybarColor today $color5
+
+# waybar - temperature
+waybarColor format-critical $color4
+
+# waybar - battery
+waybarColor format-charging $color2
+waybarColor format-plugged $color2
+
+# waybar - network
+waybarColor format-disconnected $color3
+
+for pid in $(ps axf | grep waybar | grep -v grep | awk '{print $1}'); do
+	kill -s USR2 $pid
+done
+
+echo "Updated waybar config and restarted bars."
+
+# dunst
+dunstrc=~/.config/dunst/dunstrc
+
+sed -i '/background = /s/.*/background = "'$background'f0"/' $dunstrc
+sed -i '/foreground = /s/.*/foreground = "'$color7'"/' $dunstrc
+sed -i '/frame_color = /s/.*/frame_color = "'$color1'"/' $dunstrc
+sed -i '/highlight = /s/.*/highlight = "'$color1'" /' $dunstrc
+
+killall -q dunst
+dunst &>/dev/null &
+disown
+
+echo "Updated dunst config and restarted process."
+
+# wlogout icons
+#svg_path=/usr/share/wlogout/assets
+#icon_path=~/.config/wlogout/icons
+
+#convert -background none -fill "$color1" -opaque black $svg_path/hibernate.svg $icon_path/hibernate.png
+#convert -background none -fill "$color1" -opaque black $svg_path/lock.svg $icon_path/lock.png
+#convert -background none -fill "$color1" -opaque black $svg_path/logout.svg $icon_path/logout.png
+#convert -background none -fill "$color1" -opaque black $svg_path/reboot.svg $icon_path/reboot.png
+#convert -background none -fill "$color1" -opaque black $svg_path/shutdown.svg $icon_path/shutdown.png
+#convert -background none -fill "$color1" -opaque black $svg_path/suspend.svg $icon_path/suspend.png
+
+#echo "Updated wlogout icons."
+
+# chrome
+~/.config/wal/custom/chrome/generate-theme.sh
+
+# spotify
+spicetify restore backup apply
+spicetify apply
+
+# oomox themes
+oomox-cli ~/.cache/wal/colors-oomox -o pywal
+/opt/oomox/plugins/icons_numix/change_color.sh ~/.cache/wal/colors-oomox -o pywal
+
+echo "Updated oomox themes."

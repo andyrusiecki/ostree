@@ -50,9 +50,13 @@ RUN systemctl enable fprintd && \
 RUN rm -rf /tmp/* /var/* && \
   ostree container commit
 
-FROM quay.io/fedora-ostree-desktops/sericea:${FEDORA_VERSION} as malachite-hyprland
+FROM quay.io/fedora-ostree-desktops/sericea:${FEDORA_VERSION} as olivine-hyprland
 
 COPY overlay-files/shared/ /
+COPY overlay-files/hyprland/ /
+
+# add yq binary (no rpm available)
+COPY --from=docker.io/mikefarah/yq /usr/bin/yq /usr/bin/yq
 
 RUN rpm-ostree install \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
@@ -92,6 +96,14 @@ RUN rpm-ostree install \
   steam-devices \
   tailscale
   # (swaylock-effects?)
+
+# install pywal
+RUN pip3 install pywal
+
+
+RUN /tmp/install-fonts.sh
+RUN /tmp/install-themes.sh
+RUN /tmp/install-screenshot-tools.sh
 
 # TODO: scripts to compile:
 # - bluetuith

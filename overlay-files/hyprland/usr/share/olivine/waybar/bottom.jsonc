@@ -1,0 +1,19 @@
+{
+    "name": "bottom",
+    "layer": "top",
+    "position": "bottom",
+    "height": 30,
+    "spacing": 4,
+    "include": "~/.config/waybar/modules.jsonc",
+    "modules-left": [
+        "mpris"
+    ],
+    "modules-right": [
+        "custom/updates",
+        "custom/podman",
+        "custom/kubernetes",
+        "cpu",
+        "memory",
+        "temperature"
+    ]
+}

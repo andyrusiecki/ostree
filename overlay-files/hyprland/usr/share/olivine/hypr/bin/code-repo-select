@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if ! [ -d /home/$USER/src ]; then
+	echo "code directory /home/$USER/src not found!"
+	exit 1
+fi
+
+options=$(find ~/src -mindepth 3 -maxdepth 3 -type d | sed -e 's/^\/home\/'$USER'\/src\///g')
+
+selected=$(echo -e "$options" | rofi --dmenu)
+
+if [ "$selected" != "" ]; then
+	/usr/bin/code /home/$USER/src/$selected
+fi
+

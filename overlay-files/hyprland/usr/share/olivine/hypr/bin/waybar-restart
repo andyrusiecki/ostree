@@ -1,0 +1,5 @@
+#!/bin/bash
+
+killall waybar
+waybar -c /usr/share/olivine/waybar/top.jsonc &> /dev/null & disown
+waybar -c /usr/share/olivine/waybar/bottom.jsonc &> /dev/null & disown
