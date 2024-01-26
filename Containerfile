@@ -66,7 +66,10 @@ RUN rpm-ostree override remove \
   firefox \
   firefox-langpacks \
   foot \
+  sddm-wayland-sway \
   sway \
+  sway-config-fedora \
+  sway-systemd \
   toolbox \
   xdg-desktop-portal-wlr
 
@@ -84,6 +87,7 @@ RUN rpm-ostree install \
   adwaita-icon-theme \
   adwaita-cursor-theme \
   btop \
+  catimg \
   cups \
   distrobox \
   fish \
@@ -96,10 +100,6 @@ RUN rpm-ostree install \
   steam-devices \
   tailscale
   # (swaylock-effects?)
-
-# install pywal
-RUN pip3 install pywal
-
 
 RUN /tmp/install-fonts.sh
 RUN /tmp/install-themes.sh

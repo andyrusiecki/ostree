@@ -1,0 +1,113 @@
+#!/bin/bash
+
+function color() {
+  #local currentCache="~/.cache/olivine/theme"
+  #local current="$(cat $currentCache | xargs echo -n)"
+
+  function palette() {
+    for ((i=0;i<=15;i++)); do
+      if [ $i -eq 8 ]; then
+        echo ""
+      fi
+      if [ $i -lt 8 ]; then
+        echo -en "\e[4${i}m    \e[0m"
+      else
+        echo -en "\e[48;5;${i}m    \e[0m"
+      fi
+    done
+
+    echo ""
+  }
+
+  case $1 in
+    ""|get)
+      palette
+      ;;
+    set)
+      echo "TODO: setting color scheme"
+      ;;
+    schemes)
+      echo "TODO: list available color schemes"
+      ;;
+    *)
+      echo "TODO: color subcommand usage"
+      ;;
+  esac
+}
+
+function workspaces() {
+  function set_workspaces_to_monitor {
+    local min=$1
+    local max=$2
+    local monitor_id="$3"
+    local monitor_name="$4"
+
+    for ((workspace = $min; workspace <= $max; workspace++)); do
+        is_default=false
+        if [ "$workspace" = "$min" ]; then
+            is_default=true
+        fi
+
+        echo "Workspace $workspace (default: $is_default) on $monitor_id: $monitor_name"
+
+        hyprctl dispatch moveworkspacetomonitor $workspace "$monitor_name" &> /dev/null
+        hyprctl keyword workspace $workspace, monitor:$monitor_name, default:$is_default &> /dev/null
+    done
+  }
+
+  function move_workspaces() {
+    if [ "$monitor_count" != "2" ]; then
+      echo "Found ${monitor_count} monitors instead of 2. This function only supports 2 monitors at this time."
+      exit
+    fi
+
+    hyprctl monitors -j | jq -r '.[] | "\(.id)|\(.name)|\(.description)"' | while IFS=\| read -r monitor_id monitor_name monitor_desc;
+    do
+      if [ "$monitor_name" != "eDP-1" ]; then
+        set_workspaces_to_monitor 1 5 "$monitor_id" "$monitor_name"
+      else
+        if [ "$monitor_count" = "1" ]; then
+          set_workspaces_to_monitor 1 10 "$monitor_id" "$monitor_name"
+        else
+          set_workspaces_to_monitor 6 10 "$monitor_id" "$monitor_name"
+        fi
+      fi
+    done
+  }
+
+  case $1 in
+    status)
+      echo "TODO: workspaces on monitor status"
+      ;;
+    move)
+      move_workspaces
+      ;;
+    *)
+      echo "TODO: workspaces subcommand usage"
+      ;;
+  esac
+}
+
+base=/usr/share/olivine/bin
+
+case $1 in
+  audio)
+    shift
+    $base/audioctl $@
+    ;;
+  brightness)
+    shift
+    $base/brightnessctl $@
+    ;;
+  color)
+    shift
+    color $@
+    ;;
+  lock-session)
+    swaylock --config /usr/share/olivine/hypr/swaylock/config
+    ;;
+  workspaces)
+    shift
+    workspaces $@
+    ;;
+esac

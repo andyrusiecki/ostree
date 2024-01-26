@@ -1,6 +1,6 @@
 #!/bin/bash
 
-brightness_notify() {
+function notify() {
   local value=$(light)
   value=${value%%.*}
 
@@ -15,20 +15,20 @@ case $1 in
 
   set)
     light -S $2
-    brightness_notify
+    notify
     ;;
 
   increase)
     light -A $2
-    brightness_notify
+    notify
     ;;
 
   decrease)
     light -U $2
-    brightness_notify
+    notify
     ;;
 
   *)
-    echo "command $1 not recognized"
+    echo "TODO: brightness usage"
     ;;
 esac
