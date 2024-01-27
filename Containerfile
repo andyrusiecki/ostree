@@ -50,10 +50,9 @@ RUN systemctl enable fprintd && \
 RUN rm -rf /tmp/* /var/* && \
   ostree container commit
 
-FROM quay.io/fedora-ostree-desktops/sericea:${FEDORA_VERSION} as olivine-hyprland
+FROM quay.io/fedora-ostree-desktops/base:${FEDORA_VERSION} as hyprland
 
-COPY overlay-files/shared/ /
-COPY overlay-files/hyprland/ /
+COPY overlays/hyprland/ /
 
 # add yq binary (no rpm available)
 COPY --from=docker.io/mikefarah/yq /usr/bin/yq /usr/bin/yq
@@ -62,57 +61,50 @@ RUN rpm-ostree install \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
   https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
-RUN rpm-ostree override remove \
-  firefox \
-  firefox-langpacks \
-  foot \
-  sddm-wayland-sway \
-  sway \
-  sway-config-fedora \
-  sway-systemd \
-  toolbox \
-  xdg-desktop-portal-wlr
-
 RUN rpm-ostree install \
   adw-gtk3-theme \
-  distrobox \
-  fish \
-  starship \
-  steam-devices \
-  tailscale
-
-RUN rpm-ostree install \
-  # theming - icons, lxappearance?
-  adw-gtk3-theme \
-  adwaita-icon-theme \
-  adwaita-cursor-theme \
   btop \
   catimg \
-  cups \
   distrobox \
+  dunst \
   fish \
+  git \
+  grim \
   hyprland \
-  xdg-desktop-portal-hyprland \
-  xdg-desktop-portal-gtk \
+  imv \
   kanshi \
   kitty \
+  mpv \
+  neovim \
+  playerctl \
+  polkit-gnome \
+  qt6-qtwayland \
+  ranger \
+  rofi-wayland \
+  slurp \
   starship \
   steam-devices \
-  tailscale
-  # (swaylock-effects?)
+  swaybg \
+  swaylock \
+  swayidle \
+  tailscale \
+  thunar \
+  thunar-archive-plugin \
+  thunar-volman \
+  waybar \
+  wlsunset \
+  wl-clipboard \
+  xdg-desktop-portal-hyprland \
+  sddm
+
+RUN systemctl enable sddm
 
 RUN /tmp/install-fonts.sh
 RUN /tmp/install-themes.sh
 RUN /tmp/install-screenshot-tools.sh
 
-# TODO: scripts to compile:
-# - bluetuith
-# - grimblast
-
-# TODO:
-# - rm /usr/share/sway, /usr/share/sway-systemd, /etc/sway (might be a systemd service too)
-# - update /etc/swaylock
-# - remove sddm (replace with getty launch), rm etc/sddm and etc/sddm.conf
+RUN rm -rf /tmp/* /var/* && \
+  ostree container commit
 
 FROM registry.fedoraproject.org/fedora-toolbox:${FEDORA_VERSION} as dev-toolbox
 
