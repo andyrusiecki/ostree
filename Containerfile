@@ -94,10 +94,7 @@ RUN rpm-ostree install \
   waybar \
   wlsunset \
   wl-clipboard \
-  xdg-desktop-portal-hyprland \
-  sddm
-
-RUN systemctl enable sddm
+  xdg-desktop-portal-hyprland
 
 RUN /tmp/install-fonts.sh
 RUN /tmp/install-themes.sh
