@@ -103,6 +103,10 @@ RUN /tmp/install-fonts.sh
 RUN /tmp/install-themes.sh
 RUN /tmp/install-screenshot-tools.sh
 
+RUN systemctl enable getty@tty1.service && \
+  systemctl enable rpm-ostreed-automatic.timer && \
+  systemctl enable tailscaled
+
 RUN rm -rf /tmp/* /var/* && \
   ostree container commit
 
