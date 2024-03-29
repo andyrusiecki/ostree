@@ -5,7 +5,7 @@ if [ "$UID" = "0" ]; then
   exit 1
 fi
 
-image_name=$(rpm-ostree status --json | jq -r '.deployments[] | select(.booted == true) | .["container-image-reference"]' | grep -oP --color=never '(?<=andyrusiecki/).*(?=:)')
+image_name=$(rpm-ostree status --json | jq -r '.deployments[] | select(.booted == true) | .["container-image-reference"]' | grep -oP --color=never '(?<=andyrusiecki/).*' | awk -F ':' '{ print $1 }')
 desktop_name=$(echo $image_name | awk -F '-' '{ print $1 }')
 hardware_name=$(echo $image_name | awk -F '-' '{ print $2 }')
 
@@ -59,7 +59,7 @@ flatpak_apps=(
   us.zoom.Zoom
 )
 
-if [[ "$desktop_name" == "gnome" ]]; then
+if [[ "$desktop_name" == "silverblue" ]]; then
   flatpak_apps+=(
     com.github.GradienceTeam.Gradience
     com.mattjakeman.ExtensionManager
@@ -95,7 +95,7 @@ fi
 systemctl --user enable --now podman.socket
 
 # desktop specific options
-if [[ "$desktop_name" == "gnome" ]]; then
+if [[ "$desktop_name" == "silverblue" ]]; then
   # Gnome Extensions
   extensions=(
     AlphabeticalAppGrid@stuarthayhurst
@@ -176,7 +176,7 @@ if [[ "$desktop_name" == "gnome" ]]; then
   gsettings set org.gnome.shell.extensions.mediacontrols show-control-icons-seek-forward false
 
   if [[ "$hardware_name" == "framework" ]]; then
-    gsettings set org.gnome.desktop.interface text-scaling-factor 1.25
+    #gsettings set org.gnome.desktop.interface text-scaling-factor 1.25
     gsettings set org.gnome.mutter experimental-features "['scale-monitor-framebuffer']"
 
     # default background
