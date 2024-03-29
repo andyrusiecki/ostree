@@ -1,0 +1,7 @@
+#!/bin/bash
+
+tmp_file=$(mktemp)
+
+for $file in $@; do
+
+done

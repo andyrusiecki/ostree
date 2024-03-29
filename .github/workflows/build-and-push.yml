@@ -14,7 +14,6 @@ jobs:
         image: [
           'silverblue',
           'silverblue-framework',
-          'hyprland',
           'dev-toolbox'
         ]
 

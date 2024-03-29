@@ -1,0 +1,56 @@
+#!/bin/bash
+
+config=/tmp/hyprland.conf
+
+declare -A confs
+
+for file in $(ls /usr/share/hypr/config.d/*.conf)
+do
+  confs[$file]=$(realpath $file)
+done
+
+for file in $(ls /etc/hypr/config.d/*.conf)
+do
+  confs[$file]=$(realpath $file)
+done
+
+for file in $(ls ~/.config/hypr/config.d/*.conf)
+do
+  confs[$file]=$(realpath $file)
+done
+
+echo "# Combined Hyprland Config: $config" > $config
+for file in $(echo "${!confs[@]}" | xargs -n1 | sort)
+do
+  cat ${confs[$file]} >> $config
+done
+
+echo "# Combined Hyprland Config: $config" > $config
+
+# tmp=""
+# if cat /usr/share/hypr/config.d/* > $tmp; then
+#   echo $tmp >> $config
+# fi
+
+# if cat /etc/hypr/config.d/* > $tmp; then
+#   echo $tmp >> $config
+# fi
+
+# if cat ~/.config/hypr/config.d/* > $tmp; then
+#   echo $tmp >> $config
+# fi
+
+
+case $(systemd-detect-virt --vm) in
+  "none"|"")
+    ;;
+  "kvm")
+    export WLR_NO_HARDWARE_CURSORS=1
+    export WLR_RENDERER=pixman
+    ;;
+  *)
+    export WLR_NO_HARDWARE_CURSORS=1
+    ;;
+esac
+
+exec Hyprland -c $config

@@ -50,9 +50,47 @@ RUN systemctl enable fprintd && \
 RUN rm -rf /tmp/* /var/* && \
   ostree container commit
 
-FROM quay.io/fedora-ostree-desktops/base:${FEDORA_VERSION} as hyprland
+FROM quay.io/fedora-ostree-desktops/sericea:${FEDORA_VERSION} as sericea
+
+COPY overlays/sericea/ /
+
+RUN rpm-ostree install \
+  https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
+RUN rpm-ostree override remove \
+  firefox \
+  firefox-langpacks \
+  toolbox
+
+RUN rpm-ostree install \
+  adw-gtk3-theme \
+  btop \
+  catimg \
+  distrobox \
+  fish \
+  kitty \
+  mpv \
+  neovim \
+  ranger \
+  starship \
+  steam-devices \
+  tailscale \
+  thunar-volman \
+  wlsunset
+
+RUN systemctl enable rpm-ostreed-automatic.timer && \
+  systemctl enable tailscaled
+
+RUN /tmp/install-fonts.sh
+
+RUN rm -rf /tmp/* /var/* && \
+  ostree container commit
+
+FROM quay.io/fedora-ostree-desktops/sericea:${FEDORA_VERSION} as hyprland
 
 COPY overlays/hyprland/ /
+# TODO: copy config files to etc for many programs (verified should work: dunst, swayidle, swaylock, kitty, rofi, waybar)
 
 # add yq binary (no rpm available)
 COPY --from=docker.io/mikefarah/yq /usr/bin/yq /usr/bin/yq
@@ -61,47 +99,40 @@ RUN rpm-ostree install \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
   https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
+RUN rpm-ostree override remove \
+  firefox \
+  firefox-langpacks \
+  sddm-wayland-sway \
+  sway \
+  sway-config-fedora \
+  sway-systemd \
+  toolbox \
+  xdg-desktop-portal-wlr
+
 RUN rpm-ostree install \
   adw-gtk3-theme \
   btop \
   catimg \
   distrobox \
-  dunst \
   fish \
-  git \
-  grim \
   hyprland \
-  imv \
-  kanshi \
   kitty \
   mpv \
   neovim \
-  playerctl \
-  polkit-gnome \
   qt6-qtwayland \
   ranger \
-  rofi-wayland \
-  slurp \
   starship \
   steam-devices \
-  swaybg \
-  swaylock \
-  swayidle \
   tailscale \
-  thunar \
-  thunar-archive-plugin \
   thunar-volman \
-  waybar \
   wlsunset \
-  wl-clipboard \
   xdg-desktop-portal-hyprland
 
 RUN /tmp/install-fonts.sh
 RUN /tmp/install-themes.sh
 RUN /tmp/install-screenshot-tools.sh
 
-RUN systemctl enable getty@tty1.service && \
-  systemctl enable rpm-ostreed-automatic.timer && \
+RUN systemctl enable rpm-ostreed-automatic.timer && \
   systemctl enable tailscaled
 
 RUN rm -rf /tmp/* /var/* && \
