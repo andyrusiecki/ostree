@@ -1,0 +1,51 @@
+ARG FEDORA_VERSION="39"
+
+FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_VERSION} AS silverblue
+
+COPY base/ /
+
+RUN rpm-ostree install \
+  https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
+RUN rpm-ostree override remove \
+  firefox \
+  firefox-langpacks \
+  toolbox
+
+RUN rpm-ostree install \
+  adw-gtk3-theme \
+  distrobox \
+  fish \
+  gnome-tweaks \
+  starship \
+  steam-devices \
+  tailscale
+
+RUN systemctl enable rpm-ostreed-automatic.timer && \
+  systemctl enable tailscaled
+
+RUN /tmp/install-fonts.sh
+
+RUN rm -rf /tmp/* /var/* && \
+  ostree container commit
+
+
+FROM silverblue AS silverblue-framework
+
+COPY framework/ /
+
+RUN rpm-ostree override remove \
+  power-profiles-daemon
+
+RUN rpm-ostree install \
+  fprintd \
+  tlp \
+  tlp-rdw \
+  powertop
+
+RUN systemctl enable fprintd && \
+  systemctl enable tlp
+
+RUN rm -rf /tmp/* /var/* && \
+  ostree container commit

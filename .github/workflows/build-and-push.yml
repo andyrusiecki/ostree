@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image: [
+        desktop: [
           'silverblue',
-          'silverblue-framework',
+          #'hyprland',
           'dev-toolbox'
         ]
 
@@ -26,11 +26,15 @@ jobs:
 
     - name: 'Build and Push Images'
       run: |
+        cd ./${{matrix.desktop }}
+
         build_date=$(date +%s)
-        image_base="ghcr.io/andyrusiecki/${{ matrix.image }}"
+        targets=$(sed -n 's/^FROM[[:space:]]\+[^ ]\+[[:space:]]\+AS[[:space:]]\+\([^ ]\+\)$/\1/p' Containerfile)
 
-        docker build . --file Containerfile --target ${{ matrix.image }} --tag ${image_base}:${build_date}
-        docker tag ${image_base}:${build_date} ${image_base}:latest
-        docker push --all-tags ${image_base}
+        for target in $targets; do
+          image="ghcr.io/andyrusiecki/$target"
 
-
+          docker build . --file Containerfile --target $target --tag ${image}:${build_date}
+          docker tag ${image}:${build_date} ${image}:latest
+          docker push --all-tags ${image}
+        done

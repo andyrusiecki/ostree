@@ -1,4 +1,0 @@
-timeout 600 'swaylock'
-timeout 1200 'hyprctl dispatch dpms off' resume 'hyprctl dispatch dpms on'
-timeout 1210 '[ "$(cat /sys/class/power_supply/ACAD/online)" = "0" ] && systemctl suspend'
-before-sleep 'swaylock'
