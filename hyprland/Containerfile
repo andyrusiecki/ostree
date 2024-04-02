@@ -21,6 +21,11 @@ RUN rpm-ostree install \
   git \
   grim \
   hyprland \
+  hyprland-contrib \
+  hyprpaper \
+  hypridle \
+  hyprlock \
+  hyprshot \
   imv \
   kanshi \
   kitty \
@@ -31,12 +36,10 @@ RUN rpm-ostree install \
   qt6-qtwayland \
   ranger \
   rofi-wayland \
+  sddm \
   slurp \
   starship \
   steam-devices \
-  swaybg \
-  swaylock \
-  swayidle \
   tailscale \
   thunar \
   thunar-archive-plugin \
@@ -47,10 +50,10 @@ RUN rpm-ostree install \
   xdg-desktop-portal-hyprland
 
 RUN /tmp/install-fonts.sh
-RUN /tmp/install-themes.sh
-RUN /tmp/install-screenshot-tools.sh
+#RUN /tmp/install-themes.sh
+#RUN /tmp/install-screenshot-tools.sh
 
-RUN systemctl enable getty@tty1.service && \
+RUN systemctl enable sddm && \
   systemctl enable rpm-ostreed-automatic.timer && \
   systemctl enable tailscaled
 
