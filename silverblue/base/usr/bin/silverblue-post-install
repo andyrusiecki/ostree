@@ -40,17 +40,22 @@ function getFlatpakExtension() {
 flatpak_apps=(
   com.discordapp.Discord
   com.getpostman.Postman
+  com.github.GradienceTeam.Gradience
   com.github.marhkb.Pods
   com.github.tchx84.Flatseal
   com.github.zocker_160.SyncThingy
   com.google.Chrome
+  com.mattjakeman.ExtensionManager
   com.slack.Slack
   com.spotify.Client
   com.valvesoftware.Steam
   com.visualstudio.code
   io.github.celluloid_player.Celluloid
+  io.github.giantpinkrobots.flatsweep
+  io.github.realmazharhussain.GdmSettings
   md.obsidian.Obsidian
   org.gnome.Boxes
+  org.gnome.World.PikaBackup
   org.gtk.Gtk3theme.adw-gtk3
   org.gtk.Gtk3theme.adw-gtk3-dark
   org.libreoffice.LibreOffice
@@ -58,15 +63,6 @@ flatpak_apps=(
   org.signal.Signal
   us.zoom.Zoom
 )
-
-if [[ "$desktop_name" == "silverblue" ]]; then
-  flatpak_apps+=(
-    com.github.GradienceTeam.Gradience
-    com.mattjakeman.ExtensionManager
-    io.github.realmazharhussain.GdmSettings
-    org.gnome.World.PikaBackup
-  )
-fi
 
 if [[ "$hardware_name" == "framework" ]]; then
   flatpak_apps+=(

@@ -23,6 +23,8 @@ RUN rpm-ostree install \
   tailscale
 
 RUN systemctl enable rpm-ostreed-automatic.timer && \
+  systemctl enable flatpak-system-update.timer && \
+  systemctl --global enable flatpak-user-update.timer && \
   systemctl enable tailscaled
 
 RUN /tmp/install-fonts.sh
@@ -45,7 +47,8 @@ RUN rpm-ostree install \
   powertop
 
 RUN systemctl enable fprintd && \
-  systemctl enable tlp
+  systemctl enable tlp && \
+  systemctl enable powertop
 
 RUN rm -rf /tmp/* /var/* && \
   ostree container commit
