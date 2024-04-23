@@ -45,5 +45,5 @@ jobs:
 
           digest=$(docker inspect --format='{{index .RepoDigests 0}}' $image)
 
-          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${image}@${digest}
+          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${digest}
         done
