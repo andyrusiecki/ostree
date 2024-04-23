@@ -2,6 +2,9 @@ ARG FEDORA_VERSION="39"
 
 FROM quay.io/fedora-ostree-desktops/base:${FEDORA_VERSION} AS hyprland
 
+LABEL org.opencontainers.image.title="Hyprland (andyrusiecki)"
+LABEL org.opencontainers.image.description="Custom Hyprland Environment"
+
 COPY base/ /
 
 # add yq binary (no rpm available)

@@ -18,13 +18,18 @@ jobs:
         ]
 
     steps:
-    - name: 'Checkout Github Action'
+    - name: Checkout Github Action
       uses: actions/checkout@v4
 
-    - name: 'Login to GitHub Container Registry'
+    - name: Login to GitHub Container Registry
       run: 'echo ${{secrets.GITHUB_TOKEN}} | docker login ghcr.io -u ${{github.actor}} --password-stdin'
 
-    - name: 'Build and Push Images'
+    - uses: sigstore/cosign-installer@v3.4.0
+
+    - name: Build and Push Images
+      env:
+        COSIGN_EXPERIMENTAL: false
+        COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
       run: |
         cd ./${{matrix.desktop }}
 
@@ -37,4 +42,7 @@ jobs:
           docker build . --file Containerfile --target $target --tag ${image}:${build_date}
           docker tag ${image}:${build_date} ${image}:latest
           docker push --all-tags ${image}
+
+          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${image}:${build_date}
+          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${image}:latest
         done

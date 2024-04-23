@@ -2,6 +2,9 @@ ARG FEDORA_VERSION="39"
 
 FROM registry.fedoraproject.org/fedora-toolbox:${FEDORA_VERSION} AS dev-toolbox
 
+LABEL org.opencontainers.image.title="Dev Toolbox"
+LABEL org.opencontainers.image.description="Customized Dev Environment"
+
 COPY base/ /
 
 # Set max dnf parallel downloads to 20

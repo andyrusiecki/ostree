@@ -2,6 +2,9 @@ ARG FEDORA_VERSION="39"
 
 FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_VERSION} AS silverblue
 
+LABEL org.opencontainers.image.title="Silverblue (andyrusiecki)"
+LABEL org.opencontainers.image.description="Customized Fedora Silverblue"
+
 COPY base/ /
 
 RUN rpm-ostree install \
@@ -34,6 +37,9 @@ RUN rm -rf /tmp/* /var/* && \
 
 
 FROM silverblue AS silverblue-framework
+
+LABEL org.opencontainers.image.title="Silverblue - Framework (andyrusiecki)"
+LABEL org.opencontainers.image.description="Customized Fedora Silverblue for use on Framework 13"
 
 COPY framework/ /
 
