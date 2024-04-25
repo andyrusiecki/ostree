@@ -9,7 +9,7 @@
       "ghcr.io/andyrusiecki": [
         {
           "type": "sigstoreSigned",
-          "keyPath": "/etc/pki/containers/andyrusiecki.pub",
+          "keyPath": "/usr/etc/pki/containers/andyrusiecki.pub",
           "signedIdentity": {
             "type": "matchRepository"
           }
