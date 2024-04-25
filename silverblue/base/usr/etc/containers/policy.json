@@ -1,7 +1,7 @@
 {
   "default": [
     {
-      "type": "insecureAcceptAnything"
+      "type": "reject"
     }
   ],
   "transports": {
@@ -13,6 +13,11 @@
           "signedIdentity": {
             "type": "matchRepository"
           }
+        }
+      ],
+      "": [
+        {
+          "type": "insecureAcceptAnything"
         }
       ]
     },
