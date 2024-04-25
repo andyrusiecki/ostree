@@ -1,0 +1,3 @@
+docker:
+  ghcr.io/andyrusiecki:
+    use-sigstore-attachments: true
