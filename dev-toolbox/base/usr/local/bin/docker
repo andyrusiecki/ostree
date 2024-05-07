@@ -1,0 +1,3 @@
+#!/bin/sh
+# needed to properly run as podman on the host with distrobox-host-exec
+podman $@
