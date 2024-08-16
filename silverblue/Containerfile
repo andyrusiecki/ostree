@@ -18,8 +18,14 @@ RUN rpm-ostree override remove \
 
 RUN rpm-ostree install \
   adw-gtk3-theme \
+  containerd.io \
   distrobox \
+  docker-buildx-plugin \
+  docker-ce \
+  docker-ce-cli \
+  docker-compose-plugin \
   fish \
+  gnome-console \
   gnome-tweaks \
   langpacks-en \
   man-pages \
@@ -30,33 +36,10 @@ RUN rpm-ostree install \
 RUN systemctl enable rpm-ostreed-automatic.timer && \
   systemctl enable flatpak-system-update.timer && \
   systemctl --global enable flatpak-user-update.timer && \
-  systemctl enable tailscaled
+  systemctl enable tailscaled \
+  systemctl enable docker
 
 RUN /tmp/install-fonts.sh
-
-RUN rm -rf /tmp/* /var/* && \
-  ostree container commit
-
-
-FROM silverblue AS silverblue-framework
-
-LABEL org.opencontainers.image.title="Silverblue - Framework (andyrusiecki)"
-LABEL org.opencontainers.image.description="Customized Fedora Silverblue for use on Framework 13"
-
-COPY framework/ /
-
-RUN rpm-ostree override remove \
-  power-profiles-daemon
-
-RUN rpm-ostree install \
-  fprintd \
-  tlp \
-  tlp-rdw \
-  powertop
-
-RUN systemctl enable fprintd && \
-  systemctl enable tlp && \
-  systemctl enable powertop
 
 RUN rm -rf /tmp/* /var/* && \
   ostree container commit

@@ -15,11 +15,6 @@ rpm-ostree rebase ostree-unverified-registry:ghcr.io/andyrusiecki/<image name>
 Image name = `silverblue`
 Customized [Fedora Silverblue](https://fedoraproject.org/silverblue/) image with my updated package requirements and extensions.
 
-### Gnome for Framework 13 laptop (12th Gen Intel)
-
-Image name = `silverblue-framework`
-Extended silverblue image with added customizations for the Framework 13 (12th Gen Intel) laptop.
-
 ## Other Builds
 
 These images are for non-ostree use cases.
