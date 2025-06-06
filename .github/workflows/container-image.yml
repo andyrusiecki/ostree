@@ -17,17 +17,22 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: run podman build
-      run: podman build \
-        -t ${{matrix.target}} \
-        --disable-compression=false \
-        --annotation="org.opencontainers.image.authors=andyrusiecki" \
-        --annotation="org.opencontainers.image.url=https://github.com/andyrusiecki/ostree" \
-        --annotation="org.opencontainers.image.source=https://github.com/andyrusiecki/ostree" \
-        --annotation="org.opencontainers.image.version=42.$(date -u +'%Y%m%d').$(expr $(git rev-list --count HEAD  --since=yesterday) - 1)" \
-        --annotation="org.opencontainers.image.revision=$(git rev-parse HEAD)" \
-        --annotation="org.opencontainers.image.vendor=andyrusiecki" \
-        --annotation="org.opencontainers.image.title=Atomic Desktop (${{matrix.target}})" \
-        --annotation="org.opencontainers.image.description=Custom Fedora Silverblue" \
-        .
+      run: |
+        podman build \
+          -t ${{matrix.target}} \
+          --disable-compression=false \
+          --annotation="org.opencontainers.image.authors=andyrusiecki" \
+          --annotation="org.opencontainers.image.url=https://github.com/andyrusiecki/ostree" \
+          --annotation="org.opencontainers.image.source=https://github.com/andyrusiecki/ostree" \
+          --annotation="org.opencontainers.image.version=42.$(date -u +'%Y%m%d').$(expr $(git rev-list --count HEAD  --since=yesterday) - 1)" \
+          --annotation="org.opencontainers.image.revision=$(git rev-parse HEAD)" \
+          --annotation="org.opencontainers.image.vendor=andyrusiecki" \
+          --annotation="org.opencontainers.image.title=Atomic Desktop (${{matrix.target}})" \
+          --annotation="org.opencontainers.image.description=Custom Fedora Silverblue" \
+          .
     - name: push image to ghcr.io
-      run: podman push --creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} ${{matrix.target}} ghcr.io/andyrusiecki/atomic-${{matrix.target}}:latest
+      run: |
+        podman push \
+        --creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} \
+        ${{matrix.target}} \
+        ghcr.io/andyrusiecki/atomic-${{matrix.target}}:latest
