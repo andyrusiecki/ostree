@@ -1,0 +1,7 @@
+{
+  "auths": {
+    "ghcr.io/andyrusiecki/atomic-framework": {
+      "auth": ""
+    }
+  }
+}

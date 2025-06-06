@@ -1,0 +1,128 @@
+#!/bin/bash
+
+# flatpaks
+if ! flatpak remotes | grep --quiet flathub; then
+  sudo flatpak remote-modify --no-filter --enable flathub
+fi
+
+if flatpak info org.fedoraproject.MediaWriter &>/dev/null; then
+  flatpak remove --noninteractive --assumeyes org.fedoraproject.MediaWriter
+fi
+
+if flatpak remotes | grep --quiet fedora; then
+  flatpak install --noninteractive --assumeyes --reinstall flathub $(flatpak list --app-runtime=org.fedoraproject.Platform --columns=application | tail -n +1 )
+  sudo flatpak remote-delete fedora
+fi
+
+
+flatpak_apps=(
+  com.dec05eba.gpu_screen_recorder
+  com.discordapp.Discord
+  com.getpostman.Postman
+  com.github.marhkb.Pods
+  com.github.tchx84.Flatseal
+  com.google.Chrome
+  com.mattjakeman.ExtensionManager
+  com.nextcloud.desktopclient.nextcloud
+  com.slack.Slack
+  com.spotify.Client
+  com.valvesoftware.Steam
+  com.visualstudio.code
+  dev.qwery.AddWater
+  io.github.Foldex.AdwSteamGtk
+  io.github.celluloid_player.Celluloid
+  io.github.giantpinkrobots.flatsweep
+  io.github.realmazharhussain.GdmSettings
+  io.missioncenter.MissionCenter
+  md.obsidian.Obsidian
+  me.dusansimic.DynamicWallpaper
+  org.gnome.Boxes
+  org.gnome.World.PikaBackup
+  org.libreoffice.LibreOffice
+  org.mozilla.firefox
+  org.signal.Signal
+  us.zoom.Zoom
+)
+
+flatpak_runtimes=(
+  org.gtk.Gtk3theme.adw-gtk3
+  org.freedesktop.Platform.ffmpeg-full//24.08
+  org.freedesktop.Platform.VulkanLayer.MangoHud//24.08
+)
+
+flatpak install --app --noninteractive ${flatpak_apps[@]}
+flatpak install --runtime --noninteractive ${flatpak_runtimes[@]}
+
+# change default shell
+sudo chsh -s /usr/bin/fish $USER
+
+# podman
+systemctl --user enable --now podman.socket
+
+mkdir -p $HOME/.local/bin
+curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/extras/podman-host -o $HOME/.local/bin/podman-host
+chmod +x $HOME/.local/bin/podman-host
+
+curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/extras/vscode-distrobox -o $HOME/.local/bin/vscode-distrobox
+chmod +x $HOME/.local/bin/vscode-distrobox
+
+# gnome settings
+gsettings set org.gnome.desktop.interface clock-show-weekday true
+gsettings set org.gnome.desktop.interface font-antialiasing "rgba"
+gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3"
+
+gsettings set org.gnome.mutter center-new-windows true
+gsettings set org.gnome.mutter experimental-features "['scale-monitor-framebuffer', 'variable-refresh-rate', 'xwayland-native-scaling']"
+
+gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled true
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type "nothing"
+
+gsettings set org.gnome.system.location enabled true
+
+gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'org.mozilla.firefox.desktop', 'com.google.Chrome.desktop', 'com.spotify.Client.desktop', 'com.discordapp.Discord.desktop', 'com.valvesoftware.Steam.desktop', 'com.slack.Slack.desktop', 'md.obsidian.Obsidian.desktop', 'com.visualstudio.code.desktop', 'com.github.marhkb.Pods.desktop', 'org.gnome.Ptyxis.desktop']"
+
+gsettings set org.gnome.shell.weather automatic-location true
+
+# install gnome extensions
+extensions=(
+  app-hider@lynith.dev
+  AlphabeticalAppGrid@stuarthayhurst
+  mediacontrols@cliffniff.github.com
+  nightthemeswitcher@romainvigier.fr
+  pip-on-top@rafostar.github.com
+  system-monitor@gnome-shell-extensions.gcampax.github.com
+  tailscale@joaophi.github.com
+  user-theme@gnome-shell-extensions.gcampax.github.com
+)
+
+for uuid in ${extensions[@]}
+do
+  if gnome-extensions list | grep --quiet $uuid; then
+    continue
+  fi
+
+  busctl --user call org.gnome.Shell.Extensions /org/gnome/Shell/Extensions org.gnome.Shell.Extensions InstallRemoteExtension s $uuid
+done
+
+# gnome extension settings
+schemadir="$HOME/.local/share/gnome-shell/extensions/caffeine@patapon.info/schemas"
+gsettings --schemadir $schemadir set org.gnome.shell.extensions.caffeine nightlight-control 'always'
+
+schemadir="$HOME/.local/share/gnome-shell/extensions/just-perfection-desktop@just-perfection/schemas"
+gsettings --schemadir $schemadir set org.gnome.shell.extensions.just-perfection notification-banner-position 2
+
+schemadir="$HOME/.local/share/gnome-shell/extensions/mediacontrols@cliffniff.github.com/schemas"
+gsettings --schemadir $schemadir set org.gnome.shell.extensions.mediacontrols elements-order "['ICON', 'CONTROLS', 'LABEL']"
+gsettings --schemadir $schemadir set org.gnome.shell.extensions.mediacontrols extension-index 1
+gsettings --schemadir $schemadir set org.gnome.shell.extensions.mediacontrols extension-position 'Left'
+gsettings --schemadir $schemadir set org.gnome.shell.extensions.mediacontrols labels-order "['TITLE', '-', 'ARTIST']"
+gsettings --schemadir $schemadir set org.gnome.shell.extensions.mediacontrols show-control-icons-seek-backward true
+gsettings --schemadir $schemadir set org.gnome.shell.extensions.mediacontrols show-control-icons-seek-forward true
+
+schemadir="$HOME/.local/share/gnome-shell/extensions/nightthemeswitcher@romainvigier.fr/schemas"
+gsettings --schemadir $schemadir set org.gnome.shell.extensions.nightthemeswitcher.time manual-schedule true
+gsettings --schemadir $schemadir set org.gnome.shell.extensions.nightthemeswitcher.time sunrise 6.0
+gsettings --schemadir $schemadir set org.gnome.shell.extensions.nightthemeswitcher.time sunset 18.0
+
+schemadir="$HOME/.local/share/gnome-shell/extensions/pip-on-top@rafostar.github.com/schemas"
+gsettings --schemadir $schemadir set org.gnome.shell.extensions.pip-on-top stick true

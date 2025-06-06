@@ -1,0 +1,7 @@
+####################################################
+# List of packages to remove from image
+####################################################
+
+firefox
+firefox-langpacks
+toolbox

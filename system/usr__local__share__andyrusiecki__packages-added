@@ -1,0 +1,18 @@
+####################################################
+# List of packages to install on top of base image
+####################################################
+
+adw-gtk3-theme
+btop
+distrobox
+fastfetch
+fish
+fprintd
+gnome-shell-extension-appindicator
+gnome-shell-extension-caffeine
+gnome-shell-extension-just-perfection
+neovim
+ranger
+starship
+steam-devices
+tailscale

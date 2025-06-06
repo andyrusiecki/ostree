@@ -1,0 +1,22 @@
+name: Build and Push Images (testing)
+run-name: Build and Push Images (testing)
+on:
+  workflow_dispatch:
+  #push:
+  schedule:
+  - cron: '00 12 * * FRI'    # Triggers Fri at 12:00
+
+jobs:
+  build-images:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [
+          'framework'
+        ]
+    steps:
+    - uses: actions/checkout@v4
+    - name: run podman build
+      run: podman build -t ${{matrix.target}} --disable-compression=false .
+    - name: push image to ghcr.io
+      run: podman push --creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} ${{matrix.target}} ghcr.io/andyrusiecki/atomic-${{matrix.target}}:latest
