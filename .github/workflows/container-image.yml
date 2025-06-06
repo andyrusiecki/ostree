@@ -2,7 +2,9 @@ name: Build and Push Images (testing)
 run-name: Build and Push Images (testing)
 on:
   workflow_dispatch:
-  #push:
+  push:
+    branches:
+      - main
   schedule:
   - cron: '00 12 * * FRI'    # Triggers Fri at 12:00
 
@@ -16,6 +18,8 @@ jobs:
         ]
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 20 # for correct sbuild version
     - name: run podman build
       run: |
         podman build \
