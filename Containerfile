@@ -1,7 +1,5 @@
 FROM quay.io/fedora-ostree-desktops/silverblue:42 AS base
 
-LABEL org.opencontainers.image.author="andyrusiecki"
-
 # prepare packages
 COPY --chmod=0644 ./system/usr__local__share__andyrusiecki__packages-removed /usr/local/share/andyrusiecki/packages-removed
 COPY --chmod=0644 ./system/usr__local__share__andyrusiecki__packages-added /usr/local/share/andyrusiecki/packages-added
@@ -47,9 +45,6 @@ RUN rm -rf /tmp/* /var/* && \
   ostree container commit
 
 FROM base AS framework
-
-LABEL org.opencontainers.image.title="Fedora Silverblue (Framework 13)"
-LABEL org.opencontainers.image.description="Fedora Silverblue customized for Framework 13"
 
 COPY --chmod=0644 ./system/usr__share__gnome-background-properties__framework.xml /usr/share/gnome-background-properties/framework.xml
 COPY --chmod=0644 ./system/usr__share__backgrounds__framework-d.webp /usr/share/backgrounds/framework-d.webp
