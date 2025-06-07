@@ -24,7 +24,6 @@ COPY --chmod=0600 ./system/usr__lib__ostree__auth.json /usr/lib/ostree/auth.json
 # scripts
 COPY --chmod=0755 ./scripts/* /tmp/scripts/
 RUN /tmp/scripts/install-fonts.sh
-RUN rm -r /tmp/scripts
 
 # flatpak updates
 COPY --chmod=0644 ./system/usr__lib__systemd__system__flatpak-system-update.service /usr/lib/systemd/system/flatpak-system-update.service
@@ -41,8 +40,10 @@ RUN systemctl enable rpm-ostreed-automatic.timer
 # tailscale service
 RUN systemctl enable tailscaled
 
-RUN rm -rf /tmp/* /var/* && \
-  ostree container commit
+# clean up
+RUN rm -rf /tmp/* /var/*
+RUN rpm-ostree cleanup -m
+RUN ostree container commit
 
 FROM base AS framework
 
