@@ -1,0 +1,27 @@
+####################################################
+# List of packages to remove from image
+####################################################
+
+firefox
+firefox-langpacks
+toolbox
+
+# Gnome packages to be replaced with system Flatpaks
+gnome-boxes
+gnome-connections
+gnome-text-editor
+baobab
+evince
+gnome-calculator
+gnome-calendar
+gnome-characters
+gnome-clocks
+gnome-contacts
+gnome-extensions-app
+gnome-font-viewer
+gnome-logs
+gnome-maps
+gnome-weather
+loupe
+snapshot
+sushi

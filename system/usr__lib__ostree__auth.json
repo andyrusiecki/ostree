@@ -1,6 +1,6 @@
 {
   "auths": {
-    "ghcr.io/andyrusiecki/atomic-framework": {
+    "ghcr.io/andyrusiecki/fedora-bootc-framework": {
       "auth": ""
     }
   }

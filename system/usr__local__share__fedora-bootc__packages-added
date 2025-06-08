@@ -9,8 +9,10 @@ fastfetch
 fish
 fprintd
 gnome-shell-extension-appindicator
+gnome-shell-extension-background-logo
 gnome-shell-extension-caffeine
 gnome-shell-extension-just-perfection
+gnome-software-rpm-ostree
 neovim
 ranger
 starship

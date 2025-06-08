@@ -1,0 +1,7 @@
+[Unit]
+Description=Update bootc image
+ConditionPathExists=/run/ostree-booted
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bootc update

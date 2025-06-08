@@ -1,0 +1,11 @@
+[Unit]
+Description=Update bootc image daily
+ConditionPathExists=/run/ostree-booted
+After=multi-user.target
+
+[Timer]
+OnCalendar=*-*-* 10:30:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
